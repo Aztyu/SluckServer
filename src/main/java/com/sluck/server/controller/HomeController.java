@@ -51,7 +51,7 @@ public class HomeController {
 		return "home";
 	}
 	
-	@RequestMapping(value = "/message/list/{convers}/{user}/{id}", method = RequestMethod.GET, produces="application/json;charset=UTF-8")
+	@RequestMapping(value = "/message/list/{id}", method = RequestMethod.GET, produces="application/json;charset=UTF-8")
 	public @ResponseBody Response listMessage(Model model, @PathVariable Integer id){
 		Response response = new Response();
 		if(id != null && messages.size() > id){	//Si un id est passé est qu'il est dans la plage d'index valide

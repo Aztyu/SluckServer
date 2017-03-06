@@ -21,15 +21,13 @@ public class UserDAO implements IUserDAO{
 
 	@Override
 	public void save(User u) {
-		u.setPassword(BCrypt.hashpw(u.getPassword(), BCrypt.gensalt())); 
-		
 		Session session = this.sessionFactory.openSession();
 		
 		Query query = session.createQuery("from User u where u.name = :name");
 		query.setParameter("name", u.getName());
 		List<User> user_db = (List<User>) query.getResultList();
 		
-		if(user_db != null || !user_db.isEmpty()){
+		if(user_db != null && !user_db.isEmpty()){
 			Transaction tx = session.beginTransaction();
 			session.persist(u);
 			tx.commit();
@@ -45,7 +43,7 @@ public class UserDAO implements IUserDAO{
 		query.setParameter("name", u.getName());
 		List<User> user_db = (List<User>) query.getResultList();
 		
-		if(user_db != null || !user_db.isEmpty()){
+		if(user_db != null && !user_db.isEmpty()){
 			if(BCrypt.checkpw(u.getPassword(), user_db.get(0).getPassword())){
 				return user_db.get(0);
 			}else{

@@ -13,11 +13,12 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.sluck.server.dao.interfaces.IUserDAO;
 import com.sluck.server.entity.User;
+import com.sluck.server.job.interfaces.IUserJob;
 
 @Controller
 public class UserController {
 	@Autowired
-	private IUserDAO user_dao;
+	private IUserJob user_job;
 	
 	@RequestMapping(value = "/test", method = RequestMethod.GET)
 	public @ResponseBody void test(Model model){
@@ -26,7 +27,7 @@ public class UserController {
 		user.setPassword("Test password");
 		
 		try{
-			user_dao.save(user);
+			user_job.save(user);
 		}catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -36,18 +37,23 @@ public class UserController {
 	@RequestMapping(value = "/register", method = RequestMethod.POST)
 	public @ResponseBody void register(Model model, @ModelAttribute User user){
 		try{
-			user_dao.save(user);
+			user_job.save(user);
 		}catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
 	
 	@RequestMapping(value = "/login", method = RequestMethod.POST)
-	public @ResponseBody void login(HttpServletRequest request, HttpServletResponse response, @ModelAttribute User user){
+	public @ResponseBody User login(HttpServletRequest request, HttpServletResponse response, @ModelAttribute User user){
 		try{
-			user_dao.getUser(user);
+			User user_logged = user_job.getUser(user);
+			
+			response.setHeader("Authorization", user.getToken());
+			
+			return user_logged;
 		}catch (Exception e) {
 			e.printStackTrace();
+			return null;
 		}
 	}
 }
