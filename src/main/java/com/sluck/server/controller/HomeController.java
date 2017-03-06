@@ -1,4 +1,4 @@
-package com.sluck.server;
+package com.sluck.server.controller;
 
 import java.text.DateFormat;
 import java.util.ArrayList;
@@ -8,6 +8,7 @@ import java.util.Locale;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -17,14 +18,17 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
+import com.sluck.server.dao.interfaces.IUserDAO;
 import com.sluck.server.entity.Message;
 import com.sluck.server.entity.Response;
+import com.sluck.server.entity.User;
 
 /**
  * Handles requests for the application home page.
  */
 @Controller
 public class HomeController {
+	
 	
 	private static final Logger logger = LoggerFactory.getLogger(HomeController.class);
 	
@@ -47,7 +51,7 @@ public class HomeController {
 		return "home";
 	}
 	
-	@RequestMapping(value = "/message/list/{id}", method = RequestMethod.GET, produces="application/json;charset=UTF-8")
+	@RequestMapping(value = "/message/list/{convers}/{user}/{id}", method = RequestMethod.GET, produces="application/json;charset=UTF-8")
 	public @ResponseBody Response listMessage(Model model, @PathVariable Integer id){
 		Response response = new Response();
 		if(id != null && messages.size() > id){	//Si un id est passé est qu'il est dans la plage d'index valide
@@ -67,4 +71,6 @@ public class HomeController {
 		}
 		messages.add(message);
 	}
+	
+	
 }
