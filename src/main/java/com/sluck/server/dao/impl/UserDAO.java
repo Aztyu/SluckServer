@@ -27,7 +27,7 @@ public class UserDAO implements IUserDAO{
 		query.setParameter("name", u.getName());
 		List<User> user_db = (List<User>) query.getResultList();
 		
-		if(user_db != null && !user_db.isEmpty()){
+		if(user_db != null || user_db.isEmpty()){
 			Transaction tx = session.beginTransaction();
 			session.persist(u);
 			tx.commit();

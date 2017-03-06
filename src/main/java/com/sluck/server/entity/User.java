@@ -11,11 +11,11 @@ import javax.persistence.Transient;
 @Entity
 @Table(name="User")
 public class User {
-
 	@Id
 	@Column(name="id")
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
 	private int id;
+	
 	private String name;
 	private String password;
 	
