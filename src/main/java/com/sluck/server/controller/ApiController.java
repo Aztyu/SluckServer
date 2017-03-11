@@ -67,9 +67,16 @@ public class ApiController {
 	}
 	
 	@RequestMapping(value = "/api/message/send/{conversation_id}", method = RequestMethod.POST)
-	public @ResponseBody List<Conversation> sendMessage(HttpServletRequest request, @PathVariable String conversation_id, @ModelAttribute Message message){
+	public @ResponseBody Message sendMessage(HttpServletRequest request, @PathVariable int conversation_id, @ModelAttribute Message message){
 		User user = KeyStore.getLoggedUser(request.getHeader("Authorization"));
 		
 		return message_job.sendMessage(user, message, conversation_id);
+	}
+	
+	@RequestMapping(value = "/api/message/list/{conversation_id}/{message_id}", method = RequestMethod.GET)
+	public @ResponseBody List<Message> listMessage(HttpServletRequest request, @PathVariable int conversation_id, @PathVariable int message_id){
+		User user = KeyStore.getLoggedUser(request.getHeader("Authorization"));
+		
+		return message_job.listMessages(user, conversation_id, message_id);
 	}
 }
