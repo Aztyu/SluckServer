@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.sluck.server.dao.interfaces.IUserDAO;
 import com.sluck.server.entity.User;
 import com.sluck.server.job.interfaces.IUserJob;
 
