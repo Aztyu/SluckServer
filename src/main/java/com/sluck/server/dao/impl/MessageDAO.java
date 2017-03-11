@@ -94,4 +94,30 @@ public class MessageDAO implements IMessageDAO{
 			session.close();
 		}
 	}
+	
+	@Override
+	public List<Conversation> searchConversation(String search) {
+		Session session = this.sessionFactory.openSession();
+
+		try{
+			Query query = null;
+			
+			if(search != null && !search.isEmpty()){
+				query = session.createQuery("from Conversation c where c.shared = true and c.name like :search");
+				query.setParameter("search", "%"+search+"%");
+			}else{
+				query = session.createQuery("from Conversation c where c.shared = true");
+			}
+			query.setMaxResults(100);
+			
+			List<Conversation> conversation_db = (List<Conversation>) query.getResultList();
+			
+			return conversation_db;
+		}catch(Exception ex){
+			ex.printStackTrace();
+			return null;
+		}finally{
+			session.close();
+		}
+	}
 }

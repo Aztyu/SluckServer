@@ -11,4 +11,6 @@ public interface IMessageJob {
 	public void joinConversation(int conversation_id, User user);
 
 	public List<Conversation> getConversationList(User user);
+
+	public List<Conversation> searchConversation(String search);
 }

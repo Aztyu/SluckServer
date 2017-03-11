@@ -25,11 +25,20 @@ public class MessageJob implements IMessageJob{
 	@Override
 	public void joinConversation(int conversation_id, User user) {
 		Conversation conversation = message_dao.getConversation(conversation_id);
-		message_dao.addUserToConversation(conversation, user);
+		
+		if(conversation.isShared()){	//Si la conversation n'est pas partagé/public on ne peut pas la rejoindre comme ça
+			message_dao.addUserToConversation(conversation, user);
+		}
 	}
 	
 	@Override
 	public List<Conversation> getConversationList(User user) {
 		return message_dao.getConversationList(user);
+	}
+	
+	@Override
+	public List<Conversation> searchConversation(String search) {
+		return message_dao.searchConversation(search);
+		
 	}
 }

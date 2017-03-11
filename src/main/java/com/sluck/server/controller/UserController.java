@@ -46,9 +46,6 @@ public class UserController {
 	public @ResponseBody User login(HttpServletRequest request, HttpServletResponse response, @ModelAttribute User user){
 		try{
 			User user_logged = user_job.getUser(user);
-			
-			response.setHeader("Authorization", user.getToken());
-			
 			return user_logged;
 		}catch (Exception e) {
 			e.printStackTrace();

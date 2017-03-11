@@ -10,4 +10,5 @@ public interface IMessageDAO {
 	public Conversation createConversation(Conversation conversation);
 	public Conversation getConversation(int conversation_id);
 	public List<Conversation> getConversationList(User user);
+	public List<Conversation> searchConversation(String search);
 }
