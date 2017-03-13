@@ -5,6 +5,8 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.Index;
+import javax.persistence.Table;
 
 @Entity
 public class Conversation {
@@ -14,7 +16,9 @@ public class Conversation {
 	private int id;
 	
 	private String name;
+	
 	private boolean shared;
+	
 	public int getId() {
 		return id;
 	}

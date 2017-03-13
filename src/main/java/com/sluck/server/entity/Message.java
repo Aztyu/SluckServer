@@ -5,11 +5,16 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.Index;
+import javax.persistence.Table;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 @Entity
 @JsonInclude(JsonInclude.Include.NON_NULL)
+@Table(indexes = {
+        @Index(columnList = "user_id", name = "user_hidx"),
+        @Index(columnList = "conversation_id", name = "conversation_idx")})
 public class Message {
 	@Id
 	@Column(name="id")

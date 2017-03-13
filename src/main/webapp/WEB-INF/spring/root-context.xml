@@ -19,7 +19,6 @@
 			<list>
 				<value>com.sluck.server.entity.User</value>
 				<value>com.sluck.server.entity.Conversation</value>
-				<value>com.sluck.server.entity.Conversation_Message</value>
 				<value>com.sluck.server.entity.Conversation_User</value>
 				<value>com.sluck.server.entity.Message</value>
 			</list>
