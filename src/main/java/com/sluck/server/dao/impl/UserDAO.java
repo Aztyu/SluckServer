@@ -64,5 +64,26 @@ public class UserDAO implements IUserDAO{
 		session.close();
 		return user_list;
 	}
+	
+	@Override
+	public User getUserDetail(int id) {
+		Session session = this.sessionFactory.openSession();
+		
+		Query query = session.createQuery("select u.name, u.id from User u where u.id = :id");
+		query.setParameter("id", id);
+		List<Object[]> user_db = (List<Object[]>) query.getResultList();
+		
+		if(user_db != null && !user_db.isEmpty()){
+			Object[] obj = user_db.get(0);
+			
+			User user = new User();
+			user.setName((String) obj[0]);
+			user.setId((int) obj[1]);
+			
+			return user;
+		}else{
+			return null;
+		}
+	}
 
 }

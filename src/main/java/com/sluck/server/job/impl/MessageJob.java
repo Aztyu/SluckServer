@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.sluck.server.dao.interfaces.IMessageDAO;
+import com.sluck.server.dao.interfaces.IUserDAO;
 import com.sluck.server.entity.Conversation;
 import com.sluck.server.entity.Message;
 import com.sluck.server.entity.User;
@@ -15,7 +16,15 @@ import com.sluck.server.job.interfaces.IMessageJob;
 public class MessageJob implements IMessageJob{
 	@Autowired
 	IMessageDAO message_dao;
+	
+	@Autowired
+	IUserDAO user_dao;
 
+	@Override
+	public User getUserDetail(int id) {
+		return user_dao.getUserDetail(id);
+	}
+	
 	@Override
 	public Conversation createConversation(Conversation conversation, User user) {
 		conversation = message_dao.createConversation(conversation);

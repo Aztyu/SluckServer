@@ -36,6 +36,13 @@ public class ApiController {
 		return "It's working";
 	}
 	
+	@RequestMapping(value = "/api/user/detail/{id}", method = RequestMethod.GET)
+	public @ResponseBody User getUserDetail(HttpServletRequest request, @PathVariable int id){
+		User user = KeyStore.getLoggedUser(request.getHeader("Authorization"));
+		
+		return message_job.getUserDetail(id);	
+	}
+	
 	@RequestMapping(value = "/api/conversation/create", method = RequestMethod.POST)
 	public @ResponseBody Conversation createConversation(HttpServletRequest request, @ModelAttribute Conversation conversation){
 		User user = KeyStore.getLoggedUser(request.getHeader("Authorization"));

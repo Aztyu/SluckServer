@@ -18,4 +18,6 @@ public interface IMessageJob {
 	public Message sendMessage(User user, Message message, int conversation_id);
 
 	public List<Message> listMessages(User user, int conversation_id, int message_id);
+
+	public User getUserDetail(int id);
 }
