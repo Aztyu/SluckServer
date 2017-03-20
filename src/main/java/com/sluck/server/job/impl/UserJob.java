@@ -47,8 +47,10 @@ public class UserJob implements IUserJob{
 	public User getUser(User u) {
 		User logged_user = user_dao.getUser(u);
 		
-		logged_user.setToken(generateToken());
-		KeyStore.storeToken(logged_user.getToken(), logged_user);
+		if(logged_user != null){		//Si l'utilisateur se log alors on le sauvegarde dans la liste d'utilisateur
+			logged_user.setToken(generateToken());
+			KeyStore.storeToken(logged_user.getToken(), logged_user);
+		}
 		
 		return logged_user;
 	}

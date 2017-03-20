@@ -7,7 +7,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -42,26 +44,36 @@ public class UserController {
 	}
 	
 	@RequestMapping(value = "/register", method = RequestMethod.POST)
-	public @ResponseBody void register(Model model, @RequestParam("file") MultipartFile file, @RequestParam("user") String user_json){
+	public @ResponseBody ResponseEntity<?> register(HttpServletResponse response, @RequestParam("file") MultipartFile file, @RequestParam("user") String user_json){
+		User new_user = null;
+		
 		try{
 			ObjectMapper mapper = new ObjectMapper();
 			User user = mapper.readValue(user_json, User.class);
-			User new_user = user_job.save(user);
+			new_user = user_job.save(user);
 			
 			user_job.saveThumbnail(file, new_user.getId());
+			
+			return new ResponseEntity<>(new_user, HttpStatus.OK);
 		}catch (Exception e) {
-			e.printStackTrace();
+			return new ResponseEntity<String>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
 	
 	@RequestMapping(value = "/login", method = RequestMethod.POST)
-	public @ResponseBody User login(HttpServletRequest request, HttpServletResponse response, @ModelAttribute User user){
+	public @ResponseBody ResponseEntity<?> login(HttpServletRequest request, HttpServletResponse response, @ModelAttribute User user){
 		try{
 			User user_logged = user_job.getUser(user);
-			return user_logged;
+			
+			if(user_logged != null){
+				return new ResponseEntity<>(user_logged, HttpStatus.OK);
+			}else{
+				return new ResponseEntity<>("Login ou mot de passe incorrect", HttpStatus.UNAUTHORIZED);
+			}
+			
 		}catch (Exception e) {
 			e.printStackTrace();
-			return null;
+			return new ResponseEntity<String>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
 	
