@@ -46,12 +46,9 @@ public class UserController {
 		try{
 			ObjectMapper mapper = new ObjectMapper();
 			User user = mapper.readValue(user_json, User.class);
-			
-			user_job.saveThumbnail(file, 666/*new_user.getId()*/);
-			
 			User new_user = user_job.save(user);
 			
-			
+			user_job.saveThumbnail(file, new_user.getId());
 		}catch (Exception e) {
 			e.printStackTrace();
 		}
