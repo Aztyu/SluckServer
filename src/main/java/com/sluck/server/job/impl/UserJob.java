@@ -12,6 +12,7 @@ import java.io.InputStream;
 import java.math.BigInteger;
 import java.security.SecureRandom;
 import java.util.List;
+import java.util.Properties;
 
 import javax.imageio.ImageIO;
 
@@ -26,6 +27,7 @@ import com.sluck.server.dao.interfaces.IUserDAO;
 import com.sluck.server.entity.User;
 import com.sluck.server.job.interfaces.IUserJob;
 import com.sluck.server.security.KeyStore;
+import com.sluck.server.security.PropertiesLoader;
 
 @Component
 public class UserJob implements IUserJob{
@@ -111,12 +113,19 @@ public class UserJob implements IUserJob{
 	@Override
 	public void saveThumbnail(MultipartFile file, int id) throws IOException {
 		byte[] thumbnail = getThumbnailByte(file);
-		
-		FileUtils.writeByteArrayToFile(new File("./images/profile/" + String.valueOf(id)), thumbnail);
+		Properties prop = PropertiesLoader.load("datasource.properties");
+
+		FileUtils.writeByteArrayToFile(new File(prop.getProperty("path.root") + prop.getProperty("path.profile") + String.valueOf(id)), thumbnail);
 	}
 	
 	@Override
 	public byte[] getProfile(int user_id) throws FileNotFoundException, IOException {
-		return IOUtils.toByteArray(new FileInputStream(new File("./images/profile/" + String.valueOf(user_id))));
+		Properties prop = PropertiesLoader.load("datasource.properties");
+		
+		if(prop != null){
+			return IOUtils.toByteArray(new FileInputStream(new File(prop.getProperty("path.root") + prop.getProperty("path.profile") + String.valueOf(user_id))));
+		}else{
+			return null;
+		}
 	}
 }
