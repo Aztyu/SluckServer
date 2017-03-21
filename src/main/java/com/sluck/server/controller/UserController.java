@@ -2,10 +2,13 @@ package com.sluck.server.controller;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 
+import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -28,6 +31,9 @@ import com.sluck.server.job.interfaces.IUserJob;
 public class UserController {
 	@Autowired
 	private IUserJob user_job;
+	
+	@Autowired
+    ServletContext context;
 	
 	@RequestMapping(value = "/test", method = RequestMethod.GET)
 	public @ResponseBody void test(Model model){
@@ -80,6 +86,16 @@ public class UserController {
 	@RequestMapping(value = "/user/profile/{user_id}", method = RequestMethod.GET, produces = MediaType.IMAGE_PNG_VALUE)
 	public @ResponseBody byte[] getUserProfile(HttpServletRequest request, HttpServletResponse response, @PathVariable int user_id) throws FileNotFoundException, IOException{
 		response.addHeader("Cache-Control", "max-age=600, public");	
-		return user_job.getProfile(user_id);
+		try{
+			return user_job.getProfile(user_id);
+		}catch(IOException ex){
+			InputStream in = context.getResourceAsStream("/resources/profile.png");
+			byte[] image = IOUtils.toByteArray(in);
+			if(in != null){
+				in.close();
+			}
+			return image;
+		}
+		
 	}
 }
