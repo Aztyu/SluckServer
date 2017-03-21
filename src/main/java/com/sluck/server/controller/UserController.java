@@ -50,7 +50,7 @@ public class UserController {
 	}
 	
 	@RequestMapping(value = "/register", method = RequestMethod.POST)
-	public @ResponseBody ResponseEntity<?> register(HttpServletResponse response, @RequestParam("file") MultipartFile file, @RequestParam("user") String user_json){
+	public @ResponseBody ResponseEntity<?> register(HttpServletResponse response, @RequestParam(name = "file", required = false) MultipartFile file, @RequestParam("user") String user_json){
 		User new_user = null;
 		
 		try{
@@ -58,7 +58,9 @@ public class UserController {
 			User user = mapper.readValue(user_json, User.class);
 			new_user = user_job.save(user);
 			
-			user_job.saveThumbnail(file, new_user.getId());
+			if(file != null){
+				user_job.saveThumbnail(file, new_user.getId());
+			}
 			
 			return new ResponseEntity<>(new_user, HttpStatus.OK);
 		}catch (Exception e) {
@@ -96,6 +98,5 @@ public class UserController {
 			}
 			return image;
 		}
-		
 	}
 }
