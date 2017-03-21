@@ -8,6 +8,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -17,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.sluck.server.entity.Contact;
 import com.sluck.server.entity.Conversation;
 import com.sluck.server.entity.Message;
 import com.sluck.server.entity.User;
@@ -39,12 +42,16 @@ public class ApiController {
 		return "It's working";
 	}
 	
+	/* User */
+	
 	@RequestMapping(value = "/api/user/detail/{id}", method = RequestMethod.GET)
 	public @ResponseBody User getUserDetail(HttpServletRequest request, @PathVariable int id){
 		User user = KeyStore.getLoggedUser(request.getHeader("Authorization"));
 		
 		return message_job.getUserDetail(id);	
 	}
+	
+	/* Conversation */
 	
 	@RequestMapping(value = "/api/conversation/create", method = RequestMethod.POST)
 	public @ResponseBody Conversation createConversation(HttpServletRequest request, @ModelAttribute Conversation conversation){
@@ -76,6 +83,8 @@ public class ApiController {
 		return message_job.searchConversation(search);
 	}
 	
+	/* Messages */
+	
 	@RequestMapping(value = "/api/message/send/{conversation_id}", method = RequestMethod.POST)
 	public @ResponseBody Message sendMessage(HttpServletRequest request, @PathVariable int conversation_id, @ModelAttribute Message message){
 		User user = KeyStore.getLoggedUser(request.getHeader("Authorization"));
@@ -90,5 +99,59 @@ public class ApiController {
 		return message_job.listMessages(user, conversation_id, message_id);
 	}
 	
+	/* Contact */
 	
+	@RequestMapping(value = "/api/contact/add/{contact_id}", method = RequestMethod.POST)
+	public @ResponseBody ResponseEntity<?> addContact(HttpServletRequest request, @PathVariable int contact_id){
+		User user = KeyStore.getLoggedUser(request.getHeader("Authorization"));
+		try{
+			message_job.addContact(user, contact_id);
+			return new ResponseEntity<>(HttpStatus.OK);
+		}catch(Exception ex){
+			return new ResponseEntity<>(ex.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+		}	
+	}
+	
+	@RequestMapping(value = "/api/contact/invitation/list", method = RequestMethod.POST)
+	public @ResponseBody List<Contact> getInvitationList(HttpServletRequest request){
+		User user = KeyStore.getLoggedUser(request.getHeader("Authorization"));
+
+		return message_job.getInvitationList(user);
+	}
+	
+	@RequestMapping(value = "/api/contact/invitation/{invitation_id}", method = RequestMethod.GET)
+	public @ResponseBody ResponseEntity<?> acceptInvitation(HttpServletRequest request, @PathVariable int contact_id){
+		User user = KeyStore.getLoggedUser(request.getHeader("Authorization"));
+
+		try{
+			message_job.updateInvitation(user, contact_id, true);
+			return new ResponseEntity<>(HttpStatus.OK);
+		}catch(Exception ex){
+			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR); 
+		}
+	}
+	
+	@RequestMapping(value = "/api/contact/invitation/{invitation_id}", method = RequestMethod.DELETE)
+	public @ResponseBody ResponseEntity<?> refuseInvitation(HttpServletRequest request, @PathVariable int contact_id){
+		User user = KeyStore.getLoggedUser(request.getHeader("Authorization"));
+
+		try{
+			message_job.updateInvitation(user, contact_id, false);
+			return new ResponseEntity<>(HttpStatus.OK);
+		}catch(Exception ex){
+			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR); 
+		}
+	}
+	
+	@RequestMapping(value = "/api/contact/list", method = RequestMethod.DELETE)
+	public @ResponseBody ResponseEntity<?> listContact(HttpServletRequest request, @PathVariable int contact_id){
+		User user = KeyStore.getLoggedUser(request.getHeader("Authorization"));
+
+		try{
+			
+			return new ResponseEntity<>(message_job.listContact(user.getId()), HttpStatus.OK);
+		}catch(Exception ex){
+			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR); 
+		}
+	}
 }

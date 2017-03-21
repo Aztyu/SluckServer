@@ -10,6 +10,7 @@ import org.hibernate.Transaction;
 import org.springframework.stereotype.Component;
 
 import com.sluck.server.dao.interfaces.IMessageDAO;
+import com.sluck.server.entity.Contact;
 import com.sluck.server.entity.Conversation;
 import com.sluck.server.entity.Conversation_User;
 import com.sluck.server.entity.Message;
@@ -171,6 +172,142 @@ public class MessageDAO implements IMessageDAO{
 			List<Message> messages_db = (List<Message>) query.getResultList();
 			
 			return messages_db;
+		}catch(Exception ex){
+			ex.printStackTrace();
+			return null;
+		}finally{
+			session.close();
+		}
+	}
+	
+	@Override
+	public boolean isContact(int id, int contact_id) {
+		Session session = this.sessionFactory.openSession();
+		
+		try{
+			Query query = session.createQuery("from Contact c where c.contact.id = :contact_id and c.user_id = :user_id");
+			query.setParameter("contact_id", contact_id);
+			query.setParameter("user_id", id);
+			List<Contact> contact_db = (List<Contact>) query.getResultList();
+			
+			if(contact_db != null && !contact_db.isEmpty()){
+				return true;
+			}else{
+				return false;
+			}
+		}catch(Exception ex){
+			ex.printStackTrace();
+			return false;
+		}finally{
+			session.close();
+		}
+	}
+	
+	@Override
+	public Contact createContactRequest(int id, User user_contact) {
+		Contact contact = new Contact();
+		
+		contact.setAccepted(false);
+		contact.setBlocked(false);
+		contact.setName(user_contact.getName());
+		contact.setContact_id(user_contact.getId());
+		contact.setUser_id(id);
+		
+		Session session = this.sessionFactory.openSession();
+		
+		Transaction tx = session.beginTransaction();
+		session.persist(contact);
+		tx.commit();
+		session.close();
+		
+		return contact;
+	}
+	
+	@Override
+	public List<Contact> getInvitationList(User user) {
+		Session session = this.sessionFactory.openSession();
+		
+		try{
+			Query query = session.createQuery("select c from Contact c where c.contact_id = :user_id and accepted == false");
+			query.setParameter("user_id", user.getId());
+			List<Contact> contact_db = (List<Contact>) query.getResultList();
+			
+			return contact_db;
+		}catch(Exception ex){
+			ex.printStackTrace();
+			return null;
+		}finally{
+			session.close();
+		}
+	}
+	
+	@Override
+	public void updateInvitation(Contact contact) {
+		Session session = null;
+		
+		try{
+			session = this.sessionFactory.openSession();
+			
+			Transaction tx = session.beginTransaction();
+			session.merge(contact);
+			tx.commit();
+			session.close();
+		}catch(Exception ex){
+			ex.printStackTrace();
+		}finally{
+			session.close();
+		}
+	}
+	
+	@Override
+	public void createContact(Contact user_contact) {
+		Session session = this.sessionFactory.openSession();
+		
+		Transaction tx = session.beginTransaction();
+		session.persist(user_contact);
+		tx.commit();
+		session.close();
+	}
+	
+	@Override
+	public Contact getContactForUser(User user, int contact_id) {
+		Session session = this.sessionFactory.openSession();
+		
+		try{
+			Query query = session.createQuery("select c from Contact c where c.id = :contact_id and contact_id = :user_id");
+			query.setParameter("contact_id", contact_id);
+			query.setParameter("user_id", user.getId());
+			
+			List<Contact> contacts = (List<Contact>)query.getResultList();
+			
+			if(contacts != null && !contacts.isEmpty()){
+				return contacts.get(0);
+			}else{
+				return null;
+			}
+		}catch(Exception ex){
+			ex.printStackTrace();
+			return null;
+		}finally{
+			session.close();
+		}
+	}
+	
+	@Override
+	public List<Contact> listContact(int id) {
+		Session session = this.sessionFactory.openSession();
+		
+		try{
+			Query query = session.createQuery("select c from Contact c where user_id = :user_id and accepted == true");
+			query.setParameter("user_id", id);
+			
+			List<Contact> contacts = (List<Contact>)query.getResultList();
+			
+			if(contacts != null && !contacts.isEmpty()){
+				return contacts;
+			}else{
+				return null;
+			}
 		}catch(Exception ex){
 			ex.printStackTrace();
 			return null;

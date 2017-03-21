@@ -3,10 +3,12 @@ package com.sluck.server.job.impl;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
 import com.sluck.server.dao.interfaces.IMessageDAO;
 import com.sluck.server.dao.interfaces.IUserDAO;
+import com.sluck.server.entity.Contact;
 import com.sluck.server.entity.Conversation;
 import com.sluck.server.entity.Message;
 import com.sluck.server.entity.User;
@@ -71,5 +73,51 @@ public class MessageJob implements IMessageJob{
 		}else{
 			return null;
 		}
+	}
+	
+	@Override
+	public void addContact(User user, int contact_id) throws Exception {
+		User contact_user = user_dao.getUserDetail(contact_id);
+		
+		if(user != null){
+			boolean isContact = message_dao.isContact(user.getId(), contact_id);
+			
+			if(!isContact){	//Si il y a déjà une demande on n'en refait pas d'autre
+				message_dao.createContactRequest(user.getId(), contact_user);
+			}
+		}else{
+			throw new Exception("Le contact est inexistant");
+		}	
+	}
+	
+	@Override
+	public List<Contact> getInvitationList(User user) {
+		return message_dao.getInvitationList(user);
+	}
+	
+	@Override
+	public void updateInvitation(User user, int contact_id, boolean accept) {
+		Contact contact = message_dao.getContactForUser(user, contact_id);
+		
+		contact.setAccepted(accept);		//Si on accepte alors accepted passe à true
+		contact.setBlocked(!accept);		//Si on refuse accept passe à false et blocked à true
+		
+		message_dao.updateInvitation(contact);		//On mets à jour le contact
+		
+		User contact_user = user_dao.getUserDetail(contact.getUser_id());	//On récupére l'utilisateur à l'origine de la demande
+		
+		Contact user_contact = new Contact();		//On crée le contact dans le sens opposé
+		user_contact.setUser_id(user.getId());
+		user_contact.setName(contact_user.getName());
+		user_contact.setContact_id(contact_user.getId());
+		user_contact.setAccepted(accept);			
+		user_contact.setBlocked(!accept);			
+		
+		message_dao.createContact(user_contact);
+	}
+	
+	@Override
+	public List<Contact> listContact(int id) {
+		return message_dao.listContact(id);
 	}
 }
