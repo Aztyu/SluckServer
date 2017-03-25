@@ -57,6 +57,7 @@ public class UserController {
 			ObjectMapper mapper = new ObjectMapper();
 			User user = mapper.readValue(user_json, User.class);
 			new_user = user_job.save(user);
+			new_user.setPassword(null); //On n' envoie pas la mot de passe via JSON
 			
 			if(file != null){
 				user_job.saveThumbnail(file, new_user.getId());

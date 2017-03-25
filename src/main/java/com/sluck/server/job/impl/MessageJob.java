@@ -12,6 +12,7 @@ import com.sluck.server.entity.Contact;
 import com.sluck.server.entity.Conversation;
 import com.sluck.server.entity.Message;
 import com.sluck.server.entity.User;
+import com.sluck.server.entity.response.ContactSearch;
 import com.sluck.server.job.interfaces.IMessageJob;
 
 @Component
@@ -97,12 +98,12 @@ public class MessageJob implements IMessageJob{
 	
 	@Override
 	public void updateInvitation(User user, int contact_id, boolean accept) {
-		Contact contact = message_dao.getContactForUser(user, contact_id);
+		Contact contact = message_dao.getContactForUser(user.getId(), contact_id);
 		
 		contact.setAccepted(accept);		//Si on accepte alors accepted passe à true
 		contact.setBlocked(!accept);		//Si on refuse accept passe à false et blocked à true
 		
-		message_dao.updateInvitation(contact);		//On mets à jour le contact
+		message_dao.updateContact(contact);		//On mets à jour le contact
 		
 		User contact_user = user_dao.getUserDetail(contact.getUser_id());	//On récupére l'utilisateur à l'origine de la demande
 		
@@ -119,5 +120,22 @@ public class MessageJob implements IMessageJob{
 	@Override
 	public List<Contact> listContact(int id) {
 		return message_dao.listContact(id);
+	}
+	
+	@Override
+	public void renameContact(int user_id, User contact) throws Exception {
+		Contact contact_db = message_dao.getContactForUser(user_id, contact.getId());
+		
+		if(contact_db != null){
+			contact_db.setName(contact.getName());		//On change le nom du contact
+			message_dao.updateContact(contact_db);
+		}else{
+			throw new Exception("Contact inexistant");
+		}
+	}
+	
+	@Override
+	public List<ContactSearch> searchContact(User user, String search) {
+		return message_dao.searchContact(user, search);
 	}
 }

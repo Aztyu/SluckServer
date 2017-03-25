@@ -8,6 +8,7 @@ import com.sluck.server.entity.Contact;
 import com.sluck.server.entity.Conversation;
 import com.sluck.server.entity.Message;
 import com.sluck.server.entity.User;
+import com.sluck.server.entity.response.ContactSearch;
 
 public interface IMessageJob {
 	public Conversation createConversation(Conversation conversation, User user);
@@ -21,4 +22,6 @@ public interface IMessageJob {
 	public List<Contact> getInvitationList(User user);
 	public void updateInvitation(User user, int contact_id, boolean accept);
 	public List<Contact> listContact(int id);
+	public void renameContact(int id, User contact) throws Exception;
+	public List<ContactSearch> searchContact(User user, String search);
 }

@@ -112,19 +112,19 @@ public class ApiController {
 		}	
 	}
 	
-	@RequestMapping(value = "/api/contact/invitation/list", method = RequestMethod.POST)
+	@RequestMapping(value = "/api/contact/invitation/list", method = RequestMethod.GET)
 	public @ResponseBody List<Contact> getInvitationList(HttpServletRequest request){
 		User user = KeyStore.getLoggedUser(request.getHeader("Authorization"));
 
 		return message_job.getInvitationList(user);
 	}
 	
-	@RequestMapping(value = "/api/contact/invitation/{invitation_id}", method = RequestMethod.GET)
-	public @ResponseBody ResponseEntity<?> acceptInvitation(HttpServletRequest request, @PathVariable int contact_id){
+	@RequestMapping(value = "/api/contact/invitation/{invitation_id}", method = RequestMethod.POST)
+	public @ResponseBody ResponseEntity<?> acceptInvitation(HttpServletRequest request, @PathVariable int invitation_id){
 		User user = KeyStore.getLoggedUser(request.getHeader("Authorization"));
 
 		try{
-			message_job.updateInvitation(user, contact_id, true);
+			message_job.updateInvitation(user, invitation_id, true);
 			return new ResponseEntity<>(HttpStatus.OK);
 		}catch(Exception ex){
 			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR); 
@@ -132,26 +132,44 @@ public class ApiController {
 	}
 	
 	@RequestMapping(value = "/api/contact/invitation/{invitation_id}", method = RequestMethod.DELETE)
-	public @ResponseBody ResponseEntity<?> refuseInvitation(HttpServletRequest request, @PathVariable int contact_id){
+	public @ResponseBody ResponseEntity<?> refuseInvitation(HttpServletRequest request, @PathVariable int invitation_id){
 		User user = KeyStore.getLoggedUser(request.getHeader("Authorization"));
 
 		try{
-			message_job.updateInvitation(user, contact_id, false);
+			message_job.updateInvitation(user, invitation_id, false);
 			return new ResponseEntity<>(HttpStatus.OK);
 		}catch(Exception ex){
 			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR); 
 		}
 	}
 	
-	@RequestMapping(value = "/api/contact/list", method = RequestMethod.DELETE)
-	public @ResponseBody ResponseEntity<?> listContact(HttpServletRequest request, @PathVariable int contact_id){
+	@RequestMapping(value = "/api/contact/list", method = RequestMethod.GET)
+	public @ResponseBody ResponseEntity<?> listContact(HttpServletRequest request){
 		User user = KeyStore.getLoggedUser(request.getHeader("Authorization"));
 
 		try{
-			
 			return new ResponseEntity<>(message_job.listContact(user.getId()), HttpStatus.OK);
 		}catch(Exception ex){
 			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR); 
 		}
+	}
+	
+	@RequestMapping(value = "/api/contact/rename", method = RequestMethod.POST)
+	public @ResponseBody ResponseEntity<?> renameContact(HttpServletRequest request, @ModelAttribute User contact){
+		User user = KeyStore.getLoggedUser(request.getHeader("Authorization"));
+
+		try{
+			message_job.renameContact(user.getId(), contact);
+			return new ResponseEntity<>(HttpStatus.OK);
+		}catch(Exception ex){
+			return new ResponseEntity<>(ex.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR); 
+		}
+	}
+	
+	@RequestMapping(value = "/api/contact/search", method = RequestMethod.GET)
+	public @ResponseBody ResponseEntity<?> searchUser(HttpServletRequest request, @RequestParam(required = false) String search){
+		User user = KeyStore.getLoggedUser(request.getHeader("Authorization"));
+		
+		return new ResponseEntity<>(message_job.searchContact(user, search), HttpStatus.OK);
 	}
 }

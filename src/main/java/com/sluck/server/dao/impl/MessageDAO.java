@@ -1,5 +1,6 @@
 package com.sluck.server.dao.impl;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.Query;
@@ -15,6 +16,7 @@ import com.sluck.server.entity.Conversation;
 import com.sluck.server.entity.Conversation_User;
 import com.sluck.server.entity.Message;
 import com.sluck.server.entity.User;
+import com.sluck.server.entity.response.ContactSearch;
 
 public class MessageDAO implements IMessageDAO{
 	private SessionFactory sessionFactory;
@@ -185,7 +187,7 @@ public class MessageDAO implements IMessageDAO{
 		Session session = this.sessionFactory.openSession();
 		
 		try{
-			Query query = session.createQuery("from Contact c where c.contact.id = :contact_id and c.user_id = :user_id");
+			Query query = session.createQuery("from Contact c where c.contact_id = :contact_id and c.user_id = :user_id");
 			query.setParameter("contact_id", contact_id);
 			query.setParameter("user_id", id);
 			List<Contact> contact_db = (List<Contact>) query.getResultList();
@@ -228,7 +230,7 @@ public class MessageDAO implements IMessageDAO{
 		Session session = this.sessionFactory.openSession();
 		
 		try{
-			Query query = session.createQuery("select c from Contact c where c.contact_id = :user_id and accepted == false");
+			Query query = session.createQuery("select c from Contact c where c.contact_id = :user_id and accepted = false and blocked = false");
 			query.setParameter("user_id", user.getId());
 			List<Contact> contact_db = (List<Contact>) query.getResultList();
 			
@@ -242,7 +244,7 @@ public class MessageDAO implements IMessageDAO{
 	}
 	
 	@Override
-	public void updateInvitation(Contact contact) {
+	public void updateContact(Contact contact) {
 		Session session = null;
 		
 		try{
@@ -270,13 +272,13 @@ public class MessageDAO implements IMessageDAO{
 	}
 	
 	@Override
-	public Contact getContactForUser(User user, int contact_id) {
+	public Contact getContactForUser(int user_id, int contact_id) {
 		Session session = this.sessionFactory.openSession();
 		
 		try{
-			Query query = session.createQuery("select c from Contact c where c.id = :contact_id and contact_id = :user_id");
+			Query query = session.createQuery("select c from Contact c where c.id = :contact_id and user_id = :user_id");
 			query.setParameter("contact_id", contact_id);
-			query.setParameter("user_id", user.getId());
+			query.setParameter("user_id", user_id);
 			
 			List<Contact> contacts = (List<Contact>)query.getResultList();
 			
@@ -298,7 +300,7 @@ public class MessageDAO implements IMessageDAO{
 		Session session = this.sessionFactory.openSession();
 		
 		try{
-			Query query = session.createQuery("select c from Contact c where user_id = :user_id and accepted == true");
+			Query query = session.createQuery("select c from Contact c where user_id = :user_id and accepted = true");
 			query.setParameter("user_id", id);
 			
 			List<Contact> contacts = (List<Contact>)query.getResultList();
@@ -313,6 +315,40 @@ public class MessageDAO implements IMessageDAO{
 			return null;
 		}finally{
 			session.close();
+		}
+	}
+	
+	@Override
+	public List<ContactSearch> searchContact(User user, String search) {
+		Session session = this.sessionFactory.openSession();
+		
+		Query query;
+		if(search != null && !search.isEmpty()){
+			query = session.createQuery("select u.name, u.id, c.accepted from User u left join Contact c on c.user_id = u.id where u.id <> :id and u.name like :search");
+			query.setParameter("id", user.getId());
+			query.setParameter("search", "%"+search+"%");
+		}else{
+			query = session.createQuery("select u.name, u.id, c.accepted from User u left join Contact c on c.user_id = u.id where u.id <> :id");
+			query.setParameter("id", user.getId());
+		}
+		query.setMaxResults(100);
+		
+		List<Object[]> user_db = (List<Object[]>) query.getResultList();
+		
+		if(user_db != null && !user_db.isEmpty()){
+			List<ContactSearch> contacts = new ArrayList<>();
+			
+			for(Object[] contact_obj : user_db){
+				ContactSearch contact_search = new ContactSearch();
+				contact_search.setName((String) contact_obj[0]);
+				contact_search.setId((int) contact_obj[1]);
+				contact_search.setAccepted(contact_obj[2] != null && (boolean)contact_obj[2]);
+				
+				contacts.add(contact_search);
+			}
+			return contacts;
+		}else{
+			return null;
 		}
 	}
 }
