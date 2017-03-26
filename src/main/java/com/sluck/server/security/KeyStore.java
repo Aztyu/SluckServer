@@ -23,4 +23,8 @@ public class KeyStore {
 	public static boolean hasToken(String token) {
 		return tokens.containsKey(token);
 	}
+
+	public static void clearToken(String token) {
+		tokens.remove(token);
+	}
 }

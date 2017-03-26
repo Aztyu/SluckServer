@@ -26,6 +26,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sluck.server.entity.User;
 import com.sluck.server.job.interfaces.IUserJob;
+import com.sluck.server.security.KeyStore;
 
 @Controller
 public class UserController {
@@ -99,5 +100,13 @@ public class UserController {
 			}
 			return image;
 		}
+	}
+	
+	@RequestMapping(value = "/api/logout", method = RequestMethod.GET)
+	public @ResponseBody ResponseEntity<?> logout(HttpServletRequest request, HttpServletResponse response, @ModelAttribute User user){
+		String token = request.getHeader("Authorization");
+		
+		KeyStore.clearToken(token);
+		return new ResponseEntity<>(HttpStatus.OK);
 	}
 }
