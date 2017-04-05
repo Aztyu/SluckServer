@@ -103,7 +103,7 @@ public class UserController {
 	}
 	
 	@RequestMapping(value = "/api/logout", method = RequestMethod.GET)
-	public @ResponseBody ResponseEntity<?> logout(HttpServletRequest request, HttpServletResponse response, @ModelAttribute User user){
+	public @ResponseBody ResponseEntity<?> logout(HttpServletRequest request, HttpServletResponse response){
 		String token = request.getHeader("Authorization");
 		
 		KeyStore.clearToken(token);
