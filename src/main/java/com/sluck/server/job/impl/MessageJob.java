@@ -10,6 +10,7 @@ import com.sluck.server.dao.interfaces.IMessageDAO;
 import com.sluck.server.dao.interfaces.IUserDAO;
 import com.sluck.server.entity.Contact;
 import com.sluck.server.entity.Conversation;
+import com.sluck.server.entity.Conversation_User;
 import com.sluck.server.entity.Message;
 import com.sluck.server.entity.User;
 import com.sluck.server.entity.response.ContactSearch;
@@ -41,6 +42,15 @@ public class MessageJob implements IMessageJob{
 		
 		if(conversation.isShared()){	//Si la conversation n'est pas partagé/public on ne peut pas la rejoindre comme ça
 			message_dao.addUserToConversation(conversation, user);
+		}
+	}
+	
+	@Override
+	public void quitConversation(int conversation_id, User user) {
+		Conversation_User conversation_user = message_dao.getConversationUser(conversation_id, user.getId()); 	//On vérifie que la conversation existe
+		
+		if(conversation_user != null){
+			message_dao.quitConversation(conversation_user);
 		}
 	}
 	

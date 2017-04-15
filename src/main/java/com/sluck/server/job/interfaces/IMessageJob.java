@@ -24,4 +24,5 @@ public interface IMessageJob {
 	public List<Contact> listContact(int id);
 	public void renameContact(int id, User contact) throws Exception;
 	public List<ContactSearch> searchContact(User user, String search);
+	public void quitConversation(int conversation_id, User user);
 }

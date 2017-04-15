@@ -83,6 +83,18 @@ public class ApiController {
 		return message_job.searchConversation(search);
 	}
 	
+	@RequestMapping(value = "/api/conversation/quit/{conversation_id}", method = RequestMethod.DELETE)
+	public @ResponseBody ResponseEntity<?> quitConversation(HttpServletRequest request, @PathVariable int conversation_id){
+		User user = KeyStore.getLoggedUser(request.getHeader("Authorization"));
+		
+		try{
+			message_job.quitConversation(conversation_id, user);
+			return new ResponseEntity<>(HttpStatus.OK);
+		}catch(Exception ex){
+			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR); 
+		}
+	}
+	
 	/* Messages */
 	
 	@RequestMapping(value = "/api/message/send/{conversation_id}", method = RequestMethod.POST)

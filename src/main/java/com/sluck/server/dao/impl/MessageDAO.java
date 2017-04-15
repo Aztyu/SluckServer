@@ -82,6 +82,29 @@ public class MessageDAO implements IMessageDAO{
 	}
 	
 	@Override
+	public Conversation_User getConversationUser(int conversation_id, int id) {
+		Session session = this.sessionFactory.openSession();
+		
+		try{
+			Query query = session.createQuery("from Conversation_User c_u where c_u.conversation_id = :conversation_id and c_u.user_id = :user_id");
+			query.setParameter("conversation_id", conversation_id);
+			query.setParameter("user_id", id);
+			Conversation_User conversation_db = (Conversation_User) query.getSingleResult();
+			
+			if(conversation_db != null){
+				return conversation_db;
+			}else{
+				return null;
+			}
+		}catch(Exception ex){
+			ex.printStackTrace();
+			return null;
+		}finally{
+			session.close();
+		}
+	}
+	
+	@Override
 	public List<Conversation> getConversationList(User user) {
 		Session session = this.sessionFactory.openSession();
 		
@@ -107,10 +130,10 @@ public class MessageDAO implements IMessageDAO{
 			Query query = null;
 			
 			if(search != null && !search.isEmpty()){
-				query = session.createQuery("from Conversation c where c.shared = true and c.name like :search");
+				query = session.createQuery("select c from Conversation c left join Conversation_User c_u on c_u.conversation_id = c.id where c.shared = true and c_u.id is null and c.name like :search");
 				query.setParameter("search", "%"+search+"%");
 			}else{
-				query = session.createQuery("from Conversation c where c.shared = true");
+				query = session.createQuery("select c from Conversation c left join Conversation_User c_u on c_u.conversation_id = c.id where c.shared = true and c_u.id is null");
 			}
 			query.setMaxResults(100);
 			
@@ -126,11 +149,21 @@ public class MessageDAO implements IMessageDAO{
 	}
 	
 	@Override
+	public void quitConversation(Conversation_User conversation_user) {
+		Session session = this.sessionFactory.openSession();
+		
+		Transaction tx = session.beginTransaction();
+		session.delete(conversation_user);
+		tx.commit();
+		session.close();
+	}
+	
+	@Override
 	public Conversation hasConversationAccess(User user, int conversation_id) {
 		Session session = this.sessionFactory.openSession();
 		
 		try{
-			Query query = session.createQuery("select c from Conversation c left join Conversation_User cu on cu.conversation_id = c.id and cu.user_id = :user_id where c.id = :conversation_id and (c.shared = true or cu.user_id is not null)");
+			Query query = session.createQuery("select c from Conversation c left join Conversation_User cu on cu.conversation_id = c.id and cu.user_id = :user_id where c.id = :conversation_id");
 			query.setParameter("conversation_id", conversation_id);
 			query.setParameter("user_id", user.getId());
 			
