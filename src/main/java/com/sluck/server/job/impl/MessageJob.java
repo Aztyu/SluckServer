@@ -14,6 +14,7 @@ import com.sluck.server.entity.Conversation_User;
 import com.sluck.server.entity.Message;
 import com.sluck.server.entity.User;
 import com.sluck.server.entity.response.ContactSearch;
+import com.sluck.server.entity.response.Invitation;
 import com.sluck.server.job.interfaces.IMessageJob;
 
 @Component
@@ -102,13 +103,13 @@ public class MessageJob implements IMessageJob{
 	}
 	
 	@Override
-	public List<Contact> getInvitationList(User user) {
+	public List<Invitation> getInvitationList(User user) {
 		return message_dao.getInvitationList(user);
 	}
 	
 	@Override
-	public void updateInvitation(User user, int contact_id, boolean accept) {
-		Contact contact = message_dao.getContactForUser(user.getId(), contact_id);
+	public void updateInvitation(User user, int id, boolean accept) {
+		Contact contact = message_dao.getContactForUser(id, user.getId());
 		
 		contact.setAccepted(accept);		//Si on accepte alors accepted passe à true
 		contact.setBlocked(!accept);		//Si on refuse accept passe à false et blocked à true

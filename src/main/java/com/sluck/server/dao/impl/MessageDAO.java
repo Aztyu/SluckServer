@@ -17,6 +17,7 @@ import com.sluck.server.entity.Conversation_User;
 import com.sluck.server.entity.Message;
 import com.sluck.server.entity.User;
 import com.sluck.server.entity.response.ContactSearch;
+import com.sluck.server.entity.response.Invitation;
 
 public class MessageDAO implements IMessageDAO{
 	private SessionFactory sessionFactory;
@@ -259,15 +260,29 @@ public class MessageDAO implements IMessageDAO{
 	}
 	
 	@Override
-	public List<Contact> getInvitationList(User user) {
+	public List<Invitation> getInvitationList(User user) {
 		Session session = this.sessionFactory.openSession();
 		
 		try{
-			Query query = session.createQuery("select c from Contact c where c.contact_id = :user_id and accepted = false and blocked = false");
+			Query query = session.createQuery("select c.id, c.user_id from Contact c where c.contact_id = :user_id and accepted = false and blocked = false");
 			query.setParameter("user_id", user.getId());
-			List<Contact> contact_db = (List<Contact>) query.getResultList();
+			List<Object[]> contact_db = (List<Object[]>) query.getResultList();
 			
-			return contact_db;
+			if(contact_db != null && !contact_db.isEmpty()){
+				List<Invitation> invitations = new ArrayList<>();
+				
+				for(Object[] contact_obj : contact_db){
+					Invitation invitation = new Invitation();
+					
+					invitation.setInvitation_id((int) contact_obj[0]);
+					invitation.setRequester_id((int) contact_obj[1]);
+					
+					invitations.add(invitation);
+				}
+				return invitations;
+			}else{
+				return null;
+			}
 		}catch(Exception ex){
 			ex.printStackTrace();
 			return null;
@@ -305,13 +320,13 @@ public class MessageDAO implements IMessageDAO{
 	}
 	
 	@Override
-	public Contact getContactForUser(int user_id, int contact_id) {
+	public Contact getContactForUser(int id, int contact_id) {
 		Session session = this.sessionFactory.openSession();
 		
 		try{
-			Query query = session.createQuery("select c from Contact c where c.id = :contact_id and user_id = :user_id");
+			Query query = session.createQuery("select c from Contact c where c.id = :id and contact_id = :contact_id");
 			query.setParameter("contact_id", contact_id);
-			query.setParameter("user_id", user_id);
+			query.setParameter("id", id);
 			
 			List<Contact> contacts = (List<Contact>)query.getResultList();
 			

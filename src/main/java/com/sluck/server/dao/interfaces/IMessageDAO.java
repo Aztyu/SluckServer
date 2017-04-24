@@ -8,6 +8,7 @@ import com.sluck.server.entity.Conversation_User;
 import com.sluck.server.entity.Message;
 import com.sluck.server.entity.User;
 import com.sluck.server.entity.response.ContactSearch;
+import com.sluck.server.entity.response.Invitation;
 
 public interface IMessageDAO {
 	public void addUserToConversation(Conversation conversation, User user);
@@ -20,7 +21,7 @@ public interface IMessageDAO {
 	public List<Message> listMessages(int id, int message_id);
 	public boolean isContact(int id, int contact_id);
 	public Contact createContactRequest(int id, User contact_user);
-	public List<Contact> getInvitationList(User user);
+	public List<Invitation> getInvitationList(User user);
 	public Contact getContactForUser(int user_id, int contact_id);
 	public void createContact(Contact user_contact);
 	public List<Contact> listContact(int id);

@@ -9,6 +9,7 @@ import com.sluck.server.entity.Conversation;
 import com.sluck.server.entity.Message;
 import com.sluck.server.entity.User;
 import com.sluck.server.entity.response.ContactSearch;
+import com.sluck.server.entity.response.Invitation;
 
 public interface IMessageJob {
 	public Conversation createConversation(Conversation conversation, User user);
@@ -19,7 +20,7 @@ public interface IMessageJob {
 	public List<Message> listMessages(User user, int conversation_id, int message_id);
 	public User getUserDetail(int id);
 	public void addContact(User user, int contact_id) throws Exception;
-	public List<Contact> getInvitationList(User user);
+	public List<Invitation> getInvitationList(User user);
 	public void updateInvitation(User user, int contact_id, boolean accept);
 	public List<Contact> listContact(int id);
 	public void renameContact(int id, User contact) throws Exception;

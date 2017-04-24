@@ -23,6 +23,7 @@ import com.sluck.server.entity.Contact;
 import com.sluck.server.entity.Conversation;
 import com.sluck.server.entity.Message;
 import com.sluck.server.entity.User;
+import com.sluck.server.entity.response.Invitation;
 import com.sluck.server.job.interfaces.IMessageJob;
 import com.sluck.server.job.interfaces.IUserJob;
 import com.sluck.server.security.KeyStore;
@@ -125,7 +126,7 @@ public class ApiController {
 	}
 	
 	@RequestMapping(value = "/api/contact/invitation/list", method = RequestMethod.GET)
-	public @ResponseBody List<Contact> getInvitationList(HttpServletRequest request){
+	public @ResponseBody List<Invitation> getInvitationList(HttpServletRequest request){
 		User user = KeyStore.getLoggedUser(request.getHeader("Authorization"));
 
 		return message_job.getInvitationList(user);
