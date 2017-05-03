@@ -15,12 +15,14 @@
 	    <property name="maxUploadSize" value="10000000"/>
 	</bean>
 	
-	<bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource"
-		destroy-method="close">
+	<bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
 		<property name="driverClassName" value="com.mysql.jdbc.Driver" />
 		<property name="url" value="${datasource.url}" />
 		<property name="username" value="${datasource.username}" />
 		<property name="password" value="${datasource.password}" />
+		<property name="validationQuery" value="SELECT 1"/>
+    	<property name="testOnReturn" value="false"/>
+    	<property name="testOnBorrow" value="true"/>
 	</bean>
 	
 	<bean id="hibernate4AnnotatedSessionFactory" class="org.springframework.orm.hibernate4.LocalSessionFactoryBean">
