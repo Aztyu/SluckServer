@@ -87,6 +87,39 @@ public class UserController {
 		}
 	}
 	
+	@RequestMapping(value = "/reset", method = RequestMethod.GET)
+	public @ResponseBody ResponseEntity<?> reset(HttpServletRequest request, HttpServletResponse response, @RequestParam String email){
+		try{
+			if(email != null){
+				user_job.createResetCode(email);
+				return new ResponseEntity<>(HttpStatus.OK);
+			}else{
+				return new ResponseEntity<String>("Merci de renseigner un mail", HttpStatus.INTERNAL_SERVER_ERROR);
+			}
+		}catch (Exception e) {
+			e.printStackTrace();
+			return new ResponseEntity<String>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+	
+	@RequestMapping(value = "/reset", method = RequestMethod.POST)
+	public @ResponseBody ResponseEntity<?> resetPassword(HttpServletRequest request, HttpServletResponse response){
+		try{
+			String code = request.getParameter("code");
+			String password = request.getParameter("password");
+			
+			if(code != null && password != null){
+				user_job.resetPassword(code, password);
+				return new ResponseEntity<>(HttpStatus.OK);
+			}else{
+				return new ResponseEntity<String>("Merci de rentrer un code et un mot de passe", HttpStatus.INTERNAL_SERVER_ERROR);
+			}
+		}catch (Exception e) {
+			e.printStackTrace();
+			return new ResponseEntity<String>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+	
 	@RequestMapping(value = "/user/profile/{user_id}", method = RequestMethod.GET, produces = MediaType.IMAGE_PNG_VALUE)
 	public @ResponseBody byte[] getUserProfile(HttpServletRequest request, HttpServletResponse response, @PathVariable int user_id) throws FileNotFoundException, IOException{
 		response.addHeader("Cache-Control", "max-age=600, public");	

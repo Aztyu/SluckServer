@@ -11,7 +11,9 @@ import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.stereotype.Component;
 
 import com.sluck.server.dao.interfaces.IUserDAO;
+import com.sluck.server.entity.Reset;
 import com.sluck.server.entity.User;
+import com.sluck.server.util.QwirklyUtils;
 
 public class UserDAO implements IUserDAO{
 	private SessionFactory sessionFactory;
@@ -24,8 +26,9 @@ public class UserDAO implements IUserDAO{
 	public void save(User u) {
 		Session session = this.sessionFactory.openSession();
 		
-		Query query = session.createQuery("from User u where u.name = :name");
+		Query query = session.createQuery("from User u where u.name = :name or u.email = :email");
 		query.setParameter("name", u.getName());
+		query.setParameter("email", u.getEmail());
 		List<User> user_db = (List<User>) query.getResultList();
 		
 		if(user_db != null || user_db.isEmpty()){
@@ -34,6 +37,15 @@ public class UserDAO implements IUserDAO{
 			tx.commit();
 			session.close();
 		}
+	}
+	
+	@Override
+	public void updateUser(User user) {
+		Session session = this.sessionFactory.openSession();
+		Transaction tx = session.beginTransaction();
+		session.merge(user);
+		tx.commit();
+		session.close();
 	}
 	
 	@Override
@@ -51,6 +63,51 @@ public class UserDAO implements IUserDAO{
 			}else{
 				return null;
 			}
+		}else{
+			return null;
+		}
+	}
+	
+	@Override
+	public User getUserByMail(String email) {
+		Session session = this.sessionFactory.openSession();
+		
+		Query query = session.createQuery("from User u where u.email = :email");
+		query.setParameter("email", email);
+		List<User> user_db = (List<User>) query.getResultList();
+		
+		if(user_db != null && !user_db.isEmpty()){
+			return user_db.get(0);
+		}else{
+			return null;
+		}
+	}
+	
+	@Override
+	public String createResetCode(int id) {
+		Reset reset = new Reset();
+		reset.setUser_id(id);
+		reset.setCode(QwirklyUtils.generateToken());
+		
+		Session session = this.sessionFactory.openSession();
+		Transaction tx = session.beginTransaction();
+		session.persist(reset);
+		tx.commit();
+		session.close();
+		
+		return reset.getCode();
+	}
+	
+	@Override
+	public Reset getReset(String code) {
+		Session session = this.sessionFactory.openSession();
+		
+		Query query = session.createQuery("from Reset r where r.code = :code");
+		query.setParameter("code", code);
+		List<Reset> reset_db = (List<Reset>) query.getResultList();
+		
+		if(reset_db != null && !reset_db.isEmpty()){
+			return reset_db.get(0);
 		}else{
 			return null;
 		}

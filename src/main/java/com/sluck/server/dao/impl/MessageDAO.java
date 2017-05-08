@@ -372,11 +372,11 @@ public class MessageDAO implements IMessageDAO{
 		
 		Query query;
 		if(search != null && !search.isEmpty()){
-			query = session.createQuery("select u.name, u.id, c.accepted from User u left join Contact c on c.user_id = u.id where u.id <> :id and u.name like :search");
+			query = session.createQuery("select u.name, u.id, c.accepted from User u left join Contact c on c.user_id = u.id and c.contact_id = :id where u.id <> :id and u.name like :search");
 			query.setParameter("id", user.getId());
 			query.setParameter("search", "%"+search+"%");
 		}else{
-			query = session.createQuery("select u.name, u.id, c.accepted from User u left join Contact c on c.user_id = u.id where u.id <> :id");
+			query = session.createQuery("select u.name, u.id, c.accepted from User u left join Contact c on c.user_id = u.id and c.contact_id = :id where u.id <> :id");
 			query.setParameter("id", user.getId());
 		}
 		query.setMaxResults(100);

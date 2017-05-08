@@ -19,25 +19,36 @@ import javax.imageio.ImageIO;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.sluck.server.dao.interfaces.IUserDAO;
+import com.sluck.server.entity.Reset;
 import com.sluck.server.entity.User;
 import com.sluck.server.job.interfaces.IUserJob;
 import com.sluck.server.security.KeyStore;
 import com.sluck.server.security.PropertiesLoader;
+import com.sluck.server.util.MailUtil;
+import com.sluck.server.util.QwirklyUtils;
 
 @Component
 public class UserJob implements IUserJob{
-	private SecureRandom random = new SecureRandom();
-	
 	@Autowired
 	IUserDAO user_dao;
 	
 	@Override
-	public User save(User u) {
+	public User save(User u) throws Exception {
+		if(u.getEmail() == null){
+			throw new Exception("Merci de renseigner une adresse mail");
+		}
+		
+		if(u.getName() == null){
+			throw new Exception("Merci de renseinger un nom d'utilisateur");
+		}
+		
 		u.setPassword(BCrypt.hashpw(u.getPassword(), BCrypt.gensalt())); 
 		
 		user_dao.save(u);
@@ -50,15 +61,36 @@ public class UserJob implements IUserJob{
 		User logged_user = user_dao.getUser(u);
 		
 		if(logged_user != null){		//Si l'utilisateur se log alors on le sauvegarde dans la liste d'utilisateur
-			logged_user.setToken(generateToken());
+			logged_user.setToken(QwirklyUtils.generateToken());
 			KeyStore.storeToken(logged_user.getToken(), logged_user);
 		}
 		
 		return logged_user;
 	}
-
-	private String generateToken() {
-		return new BigInteger(130, random).toString(32);
+	
+	@Override
+	public void createResetCode(String email) throws Exception {
+		User user = user_dao.getUserByMail(email);
+		if(user != null){
+			String reset_code = user_dao.createResetCode(user.getId());
+			
+			new MailUtil().sendResetMail(user.getEmail(), user.getName(), reset_code);
+		}else{
+			throw new Exception("L'adresse email est introuvable");
+		}
+	}
+	
+	@Override
+	public void resetPassword(String code, String password) throws Exception {
+		Reset reset = user_dao.getReset(code);
+		
+		if(reset != null){
+			User user = user_dao.getUserDetail(reset.getUser_id());
+			user.setPassword(BCrypt.hashpw(password, BCrypt.gensalt()));
+			user_dao.updateUser(user);
+		}else{
+			throw new Exception("Code invalide");
+		}
 	}
 
 	@Override
@@ -128,4 +160,6 @@ public class UserJob implements IUserJob{
 			return null;
 		}
 	}
+	
+	
 }

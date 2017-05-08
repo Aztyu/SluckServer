@@ -34,6 +34,7 @@
 				<value>com.sluck.server.entity.Conversation_User</value>
 				<value>com.sluck.server.entity.Message</value>
 				<value>com.sluck.server.entity.Contact</value>
+				<value>com.sluck.server.entity.Reset</value>
 			</list>
 		</property>
 		

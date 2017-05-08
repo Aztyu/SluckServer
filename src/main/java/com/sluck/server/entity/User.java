@@ -23,6 +23,7 @@ public class User {
 	
 	private String name;
 	private String password;
+	private String email;
 	
 	@Transient
 	private String token;
@@ -57,5 +58,13 @@ public class User {
 
 	public void setId(int id) {
 		this.id = id;
+	}
+
+	public String getEmail() {
+		return email;
+	}
+
+	public void setEmail(String email) {
+		this.email = email;
 	}
 }
