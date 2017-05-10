@@ -34,6 +34,10 @@ import com.sluck.server.security.PropertiesLoader;
 import com.sluck.server.util.MailUtil;
 import com.sluck.server.util.QwirklyUtils;
 
+import net.schmizz.sshj.SSHClient;
+import net.schmizz.sshj.transport.verification.PromiscuousVerifier;
+import net.schmizz.sshj.xfer.FileSystemFile;
+
 @Component
 public class UserJob implements IUserJob{
 	@Autowired
@@ -145,9 +149,27 @@ public class UserJob implements IUserJob{
 	@Override
 	public void saveThumbnail(MultipartFile file, int id) throws IOException {
 		byte[] thumbnail = getThumbnailByte(file);
+		File temp_file = new File(String.valueOf(id));
+		FileUtils.writeByteArrayToFile(temp_file, thumbnail);
+		
 		Properties prop = PropertiesLoader.load("datasource.properties");
-
-		FileUtils.writeByteArrayToFile(new File(prop.getProperty("path.root") + prop.getProperty("path.profile") + String.valueOf(id)), thumbnail);
+		
+		SSHClient ssh = null;
+		
+        try {
+        	ssh = new SSHClient();
+        	ssh.addHostKeyVerifier(new PromiscuousVerifier());		//On désactive la vérif des clés
+            ssh.connect("cdn.qwirkly.fr");
+            ssh.authPassword("qwirkly", "Supinfo69");
+            ssh.useCompression();
+            ssh.newSCPFileTransfer().upload(new FileSystemFile(temp_file), "/var/www/qwirkly-storage/profile/" + id);
+        } catch(Exception ex){
+        	ex.printStackTrace();
+        }finally{
+        	if(ssh != null){
+                ssh.disconnect();
+        	}
+        }
 	}
 	
 	@Override
