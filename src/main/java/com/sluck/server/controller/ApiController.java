@@ -81,7 +81,7 @@ public class ApiController {
 	public @ResponseBody List<Conversation> searchConversation(HttpServletRequest request, @RequestParam(required = false) String search){
 		User user = KeyStore.getLoggedUser(request.getHeader("Authorization"));
 		
-		return message_job.searchConversation(search);
+		return message_job.searchConversation(search, user.getId());
 	}
 	
 	@RequestMapping(value = "/api/conversation/quit/{conversation_id}", method = RequestMethod.DELETE)

@@ -15,7 +15,7 @@ public interface IMessageDAO {
 	public Conversation createConversation(Conversation conversation);
 	public Conversation getConversation(int conversation_id);
 	public List<Conversation> getConversationList(User user);
-	public List<Conversation> searchConversation(String search);
+	public List<Conversation> searchConversation(String search, int user_id);
 	public Conversation hasConversationAccess(User user, int conversation_id);
 	public Message sendMessage(Message message);
 	public List<Message> listMessages(int id, int message_id);

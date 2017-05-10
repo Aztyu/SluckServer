@@ -15,7 +15,7 @@ public interface IMessageJob {
 	public Conversation createConversation(Conversation conversation, User user);
 	public void joinConversation(int conversation_id, User user);
 	public List<Conversation> getConversationList(User user);
-	public List<Conversation> searchConversation(String search);
+	public List<Conversation> searchConversation(String search, int user_id);
 	public Message sendMessage(User user, Message message, int conversation_id);
 	public List<Message> listMessages(User user, int conversation_id, int message_id);
 	public User getUserDetail(int id);

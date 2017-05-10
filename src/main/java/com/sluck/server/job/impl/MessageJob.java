@@ -61,8 +61,8 @@ public class MessageJob implements IMessageJob{
 	}
 	
 	@Override
-	public List<Conversation> searchConversation(String search) {
-		return message_dao.searchConversation(search);
+	public List<Conversation> searchConversation(String search, int user_id) {
+		return message_dao.searchConversation(search, user_id);
 	}
 	
 	@Override
