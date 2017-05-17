@@ -152,8 +152,6 @@ public class UserJob implements IUserJob{
 		File temp_file = new File(String.valueOf(id));
 		FileUtils.writeByteArrayToFile(temp_file, thumbnail);
 		
-		Properties prop = PropertiesLoader.load("datasource.properties");
-		
 		SSHClient ssh = null;
 		
         try {

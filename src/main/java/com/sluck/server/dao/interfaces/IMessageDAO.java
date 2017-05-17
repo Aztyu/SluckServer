@@ -6,6 +6,7 @@ import com.sluck.server.entity.Contact;
 import com.sluck.server.entity.Conversation;
 import com.sluck.server.entity.Conversation_User;
 import com.sluck.server.entity.Message;
+import com.sluck.server.entity.MessageFile;
 import com.sluck.server.entity.User;
 import com.sluck.server.entity.response.ContactSearch;
 import com.sluck.server.entity.response.Invitation;
@@ -29,4 +30,6 @@ public interface IMessageDAO {
 	public List<ContactSearch> searchContact(User user, String search);
 	public void quitConversation(Conversation_User conversation_user);
 	public Conversation_User getConversationUser(int conversation_id, int id);
+	public void removeContactRequest(int id, User contact_user);
+	public void saveMessageFile(MessageFile file_obj);
 }

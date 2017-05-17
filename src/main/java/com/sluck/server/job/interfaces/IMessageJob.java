@@ -1,5 +1,6 @@
 package com.sluck.server.job.interfaces;
 
+import java.io.IOException;
 import java.util.List;
 
 import org.springframework.http.ResponseEntity;
@@ -16,7 +17,7 @@ public interface IMessageJob {
 	public void joinConversation(int conversation_id, User user);
 	public List<Conversation> getConversationList(User user);
 	public List<Conversation> searchConversation(String search, int user_id);
-	public Message sendMessage(User user, Message message, int conversation_id);
+	public Message sendMessage(User user, Message message, int conversation_id) throws IOException;
 	public List<Message> listMessages(User user, int conversation_id, int message_id);
 	public User getUserDetail(int id);
 	public void addContact(User user, int contact_id) throws Exception;
@@ -26,4 +27,5 @@ public interface IMessageJob {
 	public void renameContact(int id, User contact) throws Exception;
 	public List<ContactSearch> searchContact(User user, String search);
 	public void quitConversation(int conversation_id, User user);
+	public void removeContact(User user, int contact_id) throws Exception;
 }

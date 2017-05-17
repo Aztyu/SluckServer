@@ -18,10 +18,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.multipart.commons.CommonsMultipartFile;
 
 import com.sluck.server.entity.Contact;
 import com.sluck.server.entity.Conversation;
 import com.sluck.server.entity.Message;
+import com.sluck.server.entity.MessageFile;
 import com.sluck.server.entity.User;
 import com.sluck.server.entity.response.Invitation;
 import com.sluck.server.job.interfaces.IMessageJob;
@@ -99,10 +102,29 @@ public class ApiController {
 	/* Messages */
 	
 	@RequestMapping(value = "/api/message/send/{conversation_id}", method = RequestMethod.POST)
-	public @ResponseBody Message sendMessage(HttpServletRequest request, @PathVariable int conversation_id, @ModelAttribute Message message){
+	public @ResponseBody Message sendMessage(HttpServletRequest request, @PathVariable int conversation_id, @RequestParam(name = "file", required = false) CommonsMultipartFile file, @RequestParam(name = "message", required = false) String content){
 		User user = KeyStore.getLoggedUser(request.getHeader("Authorization"));
 		
-		return message_job.sendMessage(user, message, conversation_id);
+		try{
+			Message message = new Message();
+			message.setContent(content);
+			
+			MessageFile msg_file = null;
+			
+			if(file != null){
+				msg_file = new MessageFile();
+				msg_file.setContentType(file.getContentType());
+				msg_file.setName(file.getFileItem().getName());
+				msg_file.setFile(file);
+			}
+			
+			message.setFile_obj(msg_file);
+			
+			return message_job.sendMessage(user, message, conversation_id);
+		}catch(IOException ex){
+			ex.printStackTrace();
+			return null;
+		}
 	}
 	
 	@RequestMapping(value = "/api/message/list/{conversation_id}/{message_id}", method = RequestMethod.GET)
@@ -119,6 +141,17 @@ public class ApiController {
 		User user = KeyStore.getLoggedUser(request.getHeader("Authorization"));
 		try{
 			message_job.addContact(user, contact_id);
+			return new ResponseEntity<>(HttpStatus.OK);
+		}catch(Exception ex){
+			return new ResponseEntity<>(ex.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+		}	
+	}
+	
+	@RequestMapping(value = "/api/contact/remove/{contact_id}", method = RequestMethod.POST)
+	public @ResponseBody ResponseEntity<?> removeContact(HttpServletRequest request, @PathVariable int contact_id){
+		User user = KeyStore.getLoggedUser(request.getHeader("Authorization"));
+		try{
+			message_job.removeContact(user, contact_id);
 			return new ResponseEntity<>(HttpStatus.OK);
 		}catch(Exception ex){
 			return new ResponseEntity<>(ex.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);

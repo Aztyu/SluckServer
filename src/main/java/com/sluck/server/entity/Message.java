@@ -7,6 +7,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Index;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 
@@ -24,6 +25,10 @@ public class Message {
 	private String content;
 	private int user_id;
 	private int conversation_id;
+	private int file_id;
+	
+	@Transient
+	private MessageFile file_obj;
 	
 	public Message(){};
 	
@@ -60,6 +65,22 @@ public class Message {
 
 	public void setConversation_id(int conversation_id) {
 		this.conversation_id = conversation_id;
+	}
+
+	public int getFile_id() {
+		return file_id;
+	}
+
+	public void setFile_id(int file_id) {
+		this.file_id = file_id;
+	}
+
+	public MessageFile getFile_obj() {
+		return file_obj;
+	}
+
+	public void setFile_obj(MessageFile file_obj) {
+		this.file_obj = file_obj;
 	}
 	
 }

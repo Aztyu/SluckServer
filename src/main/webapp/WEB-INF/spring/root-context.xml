@@ -13,6 +13,7 @@
 	
 	<bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
 	    <property name="maxUploadSize" value="10000000"/>
+	    <property name="defaultEncoding" value="UTF-8"/>
 	</bean>
 	
 	<bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
@@ -33,6 +34,7 @@
 				<value>com.sluck.server.entity.Conversation</value>
 				<value>com.sluck.server.entity.Conversation_User</value>
 				<value>com.sluck.server.entity.Message</value>
+				<value>com.sluck.server.entity.MessageFile</value>
 				<value>com.sluck.server.entity.Contact</value>
 				<value>com.sluck.server.entity.Reset</value>
 			</list>
