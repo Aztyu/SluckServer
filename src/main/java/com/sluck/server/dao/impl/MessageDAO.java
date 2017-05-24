@@ -211,24 +211,24 @@ public class MessageDAO implements IMessageDAO{
 	}
 	
 	@Override
-	public List<Message> listMessages(int conversation_id, int message_id) {
-		/*Session session = this.sessionFactory.openSession();
-		
+	public MessageFile getMessageFile(int id) {
+		Session session = null;
 		try{
-			Query query = session.createQuery("from Message where conversation_id = :conversation_id and id > :message_id");
-			query.setParameter("conversation_id", conversation_id);
-			query.setParameter("message_id", message_id);
-			List<Message> messages_db = (List<Message>) query.getResultList();
-			
-			return messages_db;
+			session = this.sessionFactory.openSession();
+		
+			Transaction tx = session.beginTransaction();
+			return session.find(MessageFile.class, id);
 		}catch(Exception ex){
-			ex.printStackTrace();
 			return null;
 		}finally{
-			session.close();
-		}*/
-		
-		
+			if(session != null){
+				session.close();
+			}
+		}
+	}
+	
+	@Override
+	public List<Message> listMessages(int conversation_id, int message_id) {
 		Session session = this.sessionFactory.openSession();
 		
 		try{

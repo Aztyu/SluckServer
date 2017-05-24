@@ -32,4 +32,5 @@ public interface IMessageDAO {
 	public Conversation_User getConversationUser(int conversation_id, int id);
 	public void removeContactRequest(int id, User contact_user);
 	public void saveMessageFile(MessageFile file_obj);
+	public MessageFile getMessageFile(int id);
 }

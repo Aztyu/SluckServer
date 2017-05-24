@@ -2,13 +2,20 @@ package com.sluck.server.controller;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
 import java.util.List;
 
+import javax.annotation.Resource;
+import javax.print.attribute.standard.Media;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -125,6 +132,25 @@ public class ApiController {
 			ex.printStackTrace();
 			return null;
 		}
+	}
+	
+	@RequestMapping(value = "/file/{id}", method = RequestMethod.GET)
+	public void getFileById(HttpServletRequest request, HttpServletResponse response, @PathVariable int id){
+		//User user = KeyStore.getLoggedUser(request.getHeader("Authorization"));
+		
+		try{
+			
+	      	MessageFile message_file = message_job.getMessageFile(id);
+	      	
+	      	response.setContentType(message_file.getContentType());      
+	      	response.setHeader("Content-Disposition", "attachment; filename=\"" + message_file.getName() + "\""); 
+	      	
+	      	InputStream input = new URL("http://cdn.qwirkly.fr/file/" + id).openStream();
+	      	org.apache.commons.io.IOUtils.copy(input, response.getOutputStream());
+	      	response.flushBuffer();
+	    }catch (IOException ex) {
+	    	throw new RuntimeException("IOError writing file to output stream");
+	    }
 	}
 	
 	@RequestMapping(value = "/api/message/list/{conversation_id}/{message_id}", method = RequestMethod.GET)

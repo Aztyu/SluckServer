@@ -2,6 +2,7 @@ package com.sluck.server.job.impl;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
 import java.util.Properties;
 
@@ -117,6 +118,11 @@ public class MessageJob implements IMessageJob{
                 ssh.disconnect();
         	}
         }
+	}
+	
+	@Override
+	public MessageFile getMessageFile(int id) {
+		return message_dao.getMessageFile(id);
 	}
 
 	@Override

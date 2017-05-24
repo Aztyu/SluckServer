@@ -1,6 +1,7 @@
 package com.sluck.server.job.interfaces;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
 
 import org.springframework.http.ResponseEntity;
@@ -8,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import com.sluck.server.entity.Contact;
 import com.sluck.server.entity.Conversation;
 import com.sluck.server.entity.Message;
+import com.sluck.server.entity.MessageFile;
 import com.sluck.server.entity.User;
 import com.sluck.server.entity.response.ContactSearch;
 import com.sluck.server.entity.response.Invitation;
@@ -28,4 +30,5 @@ public interface IMessageJob {
 	public List<ContactSearch> searchContact(User user, String search);
 	public void quitConversation(int conversation_id, User user);
 	public void removeContact(User user, int contact_id) throws Exception;
+	public MessageFile getMessageFile(int id);
 }
