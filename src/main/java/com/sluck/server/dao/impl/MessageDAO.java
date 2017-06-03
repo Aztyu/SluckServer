@@ -18,6 +18,7 @@ import com.sluck.server.entity.Message;
 import com.sluck.server.entity.MessageFile;
 import com.sluck.server.entity.User;
 import com.sluck.server.entity.response.ContactSearch;
+import com.sluck.server.entity.response.ContactStatus;
 import com.sluck.server.entity.response.Invitation;
 
 public class MessageDAO implements IMessageDAO{
@@ -426,16 +427,25 @@ public class MessageDAO implements IMessageDAO{
 	}
 	
 	@Override
-	public List<Contact> listContact(int id) {
+	public List<ContactStatus> listContact(int id) {
 		Session session = this.sessionFactory.openSession();
 		
 		try{
-			Query query = session.createQuery("select c from Contact c where user_id = :user_id and accepted = true");
+			Query query = session.createQuery("select c, u.status_id from Contact c left join User u on c.contact_id = u.id where user_id = :user_id and accepted = true");
 			query.setParameter("user_id", id);
 			
-			List<Contact> contacts = (List<Contact>)query.getResultList();
+			List<Object[]> contacts_db = (List<Object[]>)query.getResultList();
 			
-			if(contacts != null && !contacts.isEmpty()){
+			if(contacts_db != null && !contacts_db.isEmpty()){
+				List<ContactStatus> contacts = new ArrayList<>();
+				
+				for(Object[] contact_obj : contacts_db){
+					ContactStatus contact_status = new ContactStatus();
+					contact_status.setContact((Contact) contact_obj[0]);
+					contact_status.setStatus((int) contact_obj[1]);
+					
+					contacts.add(contact_status);
+				}
 				return contacts;
 			}else{
 				return null;

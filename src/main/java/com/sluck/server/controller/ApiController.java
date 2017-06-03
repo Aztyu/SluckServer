@@ -63,7 +63,7 @@ public class ApiController {
 	}
 	
 	@RequestMapping(value = "/api/user/status/{status_id}", method = RequestMethod.GET)
-	public void setUserStatus(HttpServletRequest request, @PathVariable int status_id){
+	public @ResponseBody void setUserStatus(HttpServletRequest request, @PathVariable int status_id){
 		User user = KeyStore.getLoggedUser(request.getHeader("Authorization"));
 		
 		user_job.setUserStatus(user, status_id);	

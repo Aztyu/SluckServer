@@ -21,6 +21,7 @@ import com.sluck.server.entity.Message;
 import com.sluck.server.entity.MessageFile;
 import com.sluck.server.entity.User;
 import com.sluck.server.entity.response.ContactSearch;
+import com.sluck.server.entity.response.ContactStatus;
 import com.sluck.server.entity.response.Invitation;
 import com.sluck.server.job.interfaces.IMessageJob;
 import com.sluck.server.security.PropertiesLoader;
@@ -194,7 +195,7 @@ public class MessageJob implements IMessageJob{
 	}
 	
 	@Override
-	public List<Contact> listContact(int id) {
+	public List<ContactStatus> listContact(int id) {
 		return message_dao.listContact(id);
 	}
 	

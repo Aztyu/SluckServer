@@ -9,6 +9,7 @@ import com.sluck.server.entity.Message;
 import com.sluck.server.entity.MessageFile;
 import com.sluck.server.entity.User;
 import com.sluck.server.entity.response.ContactSearch;
+import com.sluck.server.entity.response.ContactStatus;
 import com.sluck.server.entity.response.Invitation;
 
 public interface IMessageDAO {
@@ -25,7 +26,7 @@ public interface IMessageDAO {
 	public List<Invitation> getInvitationList(User user);
 	public Contact getContactForUser(int user_id, int contact_id);
 	public void createContact(Contact user_contact);
-	public List<Contact> listContact(int id);
+	public List<ContactStatus> listContact(int id);
 	public void updateContact(Contact contact_db);
 	public List<ContactSearch> searchContact(User user, String search);
 	public void quitConversation(Conversation_User conversation_user);

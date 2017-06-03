@@ -18,7 +18,7 @@ public class Contact {
 	private int contact_id;		//l'id du contact
 	private boolean accepted;	//l'état de l'invitation
 	private boolean blocked;	//l'état du contact, est ce que l'user l'a bloqué
-	
+
 	public int getId() {
 		return id;
 	}
