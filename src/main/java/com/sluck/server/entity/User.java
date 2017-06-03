@@ -24,6 +24,7 @@ public class User {
 	private String name;
 	private String password;
 	private String email;
+	private int status_id;
 	
 	@Transient
 	private String token;
@@ -66,5 +67,13 @@ public class User {
 
 	public void setEmail(String email) {
 		this.email = email;
+	}
+
+	public int getStatus_id() {
+		return status_id;
+	}
+
+	public void setStatus_id(int status_id) {
+		this.status_id = status_id;
 	}
 }

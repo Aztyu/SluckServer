@@ -16,4 +16,6 @@ public interface IUserJob {
 	public byte[] getProfile(int user_id) throws FileNotFoundException, IOException;
 	public void createResetCode(String email) throws Exception;
 	public void resetPassword(String code, String password) throws Exception;
+	public void setUserStatus(User user, int status_id);
+	public User getUserInfo(User user);
 }

@@ -23,7 +23,7 @@ public class UserDAO implements IUserDAO{
     }
 
 	@Override
-	public void save(User u) {
+	public void createUser(User u) {
 		Session session = this.sessionFactory.openSession();
 		
 		Query query = session.createQuery("from User u where u.name = :name or u.email = :email");
@@ -44,6 +44,20 @@ public class UserDAO implements IUserDAO{
 		Session session = this.sessionFactory.openSession();
 		Transaction tx = session.beginTransaction();
 		session.merge(user);
+		
+		session.close();
+	}
+	
+	@Override
+	public void updateUserStatus(int id, int status_id) {
+		Session session = this.sessionFactory.openSession();
+		Transaction tx = session.beginTransaction();
+		
+		Query query = session.createQuery("update User set status_id = :status_id where id = :id");
+		query.setParameter("status_id", status_id);
+		query.setParameter("id", id);
+		
+		query.executeUpdate();
 		tx.commit();
 		session.close();
 	}
@@ -120,6 +134,23 @@ public class UserDAO implements IUserDAO{
 		List<User> user_list = (List<User>)session.createQuery("from User").list();
 		session.close();
 		return user_list;
+	}
+	
+	@Override
+	public User getUser(int id){
+		Session session = null;
+		try{ 
+			session = this.sessionFactory.openSession();
+			Transaction tx = session.beginTransaction();
+			return session.find(User.class, id);
+		}catch(Exception ex){
+			ex.printStackTrace();
+			return null;
+		}finally{
+			if(session != null){
+				session.close();
+			}
+		}
 	}
 	
 	@Override

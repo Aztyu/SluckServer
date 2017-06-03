@@ -14,9 +14,8 @@ public class Conversation {
 	@Column(name="id")
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
 	private int id;
-	
+
 	private String name;
-	
 	private boolean shared;
 	
 	public int getId() {

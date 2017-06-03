@@ -139,6 +139,10 @@ public class UserController {
 	public @ResponseBody ResponseEntity<?> logout(HttpServletRequest request, HttpServletResponse response){
 		String token = request.getHeader("Authorization");
 		
+		User user = KeyStore.getLoggedUser(token);
+		User db_user = user_job.getUserInfo(user);
+		user_job.setUserStatus(db_user, 3);
+		
 		KeyStore.clearToken(token);
 		return new ResponseEntity<>(HttpStatus.OK);
 	}

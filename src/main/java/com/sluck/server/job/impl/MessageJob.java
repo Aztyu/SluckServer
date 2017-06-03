@@ -42,6 +42,8 @@ public class MessageJob implements IMessageJob{
 		return user_dao.getUserDetail(id);
 	}
 	
+	
+	
 	@Override
 	public Conversation createConversation(Conversation conversation, User user) {
 		conversation = message_dao.createConversation(conversation);

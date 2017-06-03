@@ -55,7 +55,7 @@ public class UserJob implements IUserJob{
 		
 		u.setPassword(BCrypt.hashpw(u.getPassword(), BCrypt.gensalt())); 
 		
-		user_dao.save(u);
+		user_dao.createUser(u);
 		
 		return u;
 	}
@@ -64,12 +64,24 @@ public class UserJob implements IUserJob{
 	public User getUser(User u) {
 		User logged_user = user_dao.getUser(u);
 		
+		setUserStatus(logged_user, 1);	//On définit le status en connecté
+		
 		if(logged_user != null){		//Si l'utilisateur se log alors on le sauvegarde dans la liste d'utilisateur
 			logged_user.setToken(QwirklyUtils.generateToken());
 			KeyStore.storeToken(logged_user.getToken(), logged_user);
 		}
 		
 		return logged_user;
+	}
+	
+	@Override
+	public User getUserInfo(User user) {
+		return user_dao.getUser(user.getId());
+	}
+	
+	@Override
+	public void setUserStatus(User user, int status_id) {		
+		user_dao.updateUserStatus(user.getId(), status_id);
 	}
 	
 	@Override
@@ -89,7 +101,7 @@ public class UserJob implements IUserJob{
 		Reset reset = user_dao.getReset(code);
 		
 		if(reset != null){
-			User user = user_dao.getUserDetail(reset.getUser_id());
+			User user = user_dao.getUser(reset.getUser_id());
 			user.setPassword(BCrypt.hashpw(password, BCrypt.gensalt()));
 			user_dao.updateUser(user);
 		}else{
