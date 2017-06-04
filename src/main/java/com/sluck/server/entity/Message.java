@@ -1,5 +1,7 @@
 package com.sluck.server.entity;
 
+import java.sql.Timestamp;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -26,6 +28,9 @@ public class Message {
 	private int user_id;
 	private int conversation_id;
 	private int file_id;
+	
+	@Column(columnDefinition="TIMESTAMP DEFAULT CURRENT_TIMESTAMP", updatable=false, insertable=false)
+	private Timestamp time;
 	
 	@Transient
 	private MessageFile file_obj;
@@ -82,5 +87,12 @@ public class Message {
 	public void setFile_obj(MessageFile file_obj) {
 		this.file_obj = file_obj;
 	}
+
+	public Timestamp getTime() {
+		return time;
+	}
 	
+	public void setTime(Timestamp time) {
+		this.time = time;
+	}
 }

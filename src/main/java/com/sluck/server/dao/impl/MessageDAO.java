@@ -1,5 +1,6 @@
 package com.sluck.server.dao.impl;
 
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -233,7 +234,7 @@ public class MessageDAO implements IMessageDAO{
 		Session session = this.sessionFactory.openSession();
 		
 		try{
-			Query query = session.createQuery("select m.id, m.content, m.conversation_id, m.user_id, mj.id, mj.contentType, mj.name from Message m left join MessageFile mj on m.file_id = mj.id where m.conversation_id = :conversation_id and m.id > :message_id order by m.id");
+			Query query = session.createQuery("select m.id, m.content, m.conversation_id, m.user_id, m.time, mj.id, mj.contentType, mj.name from Message m left join MessageFile mj on m.file_id = mj.id where m.conversation_id = :conversation_id and m.id > :message_id order by m.id");
 			query.setParameter("conversation_id", conversation_id);
 			query.setParameter("message_id", message_id);
 			List<Object[]> message_db = (List<Object[]>) query.getResultList();
@@ -248,15 +249,15 @@ public class MessageDAO implements IMessageDAO{
 					message.setContent((String) message_obj[1]);
 					message.setConversation_id((int) message_obj[2]);
 					message.setUser_id((int) message_obj[3]);
-					
-					//temp_id = message_obj[4];
-					message.setFile_id((message_obj[4] != null) ? (int)(message_obj[4]) : 0);
+					message.setTime((Timestamp) message_obj[4]);
+
+					message.setFile_id((message_obj[5] != null) ? (int)(message_obj[5]) : 0);
 					
 					if(message.getFile_id() > 0){
 						MessageFile message_file = new MessageFile();
 						message_file.setId(message.getFile_id());
-						message_file.setContentType((String) message_obj[5]);
-						message_file.setName((String) message_obj[6]);
+						message_file.setContentType((String) message_obj[6]);
+						message_file.setName((String) message_obj[7]);
 						
 						message.setFile_obj(message_file);
 					}
