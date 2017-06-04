@@ -47,6 +47,7 @@ public class MessageJob implements IMessageJob{
 	
 	@Override
 	public Conversation createConversation(Conversation conversation, User user) {
+		conversation.setChat(false); 		//On définit la conversation en non chat pour ne pas limiter à 2 personnes
 		conversation = message_dao.createConversation(conversation);
 		message_dao.addUserToConversation(conversation, user);
 		return conversation;
@@ -131,6 +132,16 @@ public class MessageJob implements IMessageJob{
 	@Override
 	public List<Message> listMessages(User user, int conversation_id, int message_id) {
 		Conversation conversation = message_dao.hasConversationAccess(user, conversation_id);		//On vérifie les droits sur la conversation
+		if(conversation != null){
+			return message_dao.listMessages(conversation.getId(), message_id);
+		}else{
+			return null;
+		}
+	}
+	
+	@Override
+	public List<Message> listChatMessages(User user, int contact_id, int message_id) {
+		Conversation conversation = message_dao.findChatConversation(user, contact_id);		//On vérifie les droits sur la conversation
 		if(conversation != null){
 			return message_dao.listMessages(conversation.getId(), message_id);
 		}else{

@@ -167,6 +167,13 @@ public class ApiController {
 		return message_job.listMessages(user, conversation_id, message_id);
 	}
 	
+	@RequestMapping(value = "/api/message/chat/{contact_id}/{message_id}", method = RequestMethod.GET)
+	public @ResponseBody List<Message> listChatMessage(HttpServletRequest request, @PathVariable int contact_id, @PathVariable int message_id){
+		User user = KeyStore.getLoggedUser(request.getHeader("Authorization"));
+		
+		return message_job.listChatMessages(user, contact_id, message_id);
+	}
+	
 	/* Contact */
 	
 	@RequestMapping(value = "/api/contact/add/{contact_id}", method = RequestMethod.POST)

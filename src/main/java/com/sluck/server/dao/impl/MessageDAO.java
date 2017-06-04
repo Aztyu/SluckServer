@@ -112,7 +112,7 @@ public class MessageDAO implements IMessageDAO{
 		Session session = this.sessionFactory.openSession();
 		
 		try{
-			Query query = session.createQuery("select c from Conversation c left join Conversation_User cu on c.id = cu.conversation_id where cu.user_id = :id");
+			Query query = session.createQuery("select c from Conversation c left join Conversation_User cu on c.id = cu.conversation_id where cu.user_id = :id and c.chat = false");
 			query.setParameter("id", user.getId());
 			List<Conversation> conversation_db = (List<Conversation>) query.getResultList();
 			
@@ -133,11 +133,11 @@ public class MessageDAO implements IMessageDAO{
 			Query query = null;
 			
 			if(search != null && !search.isEmpty()){
-				query = session.createQuery("select c from Conversation c left join Conversation_user c_u on c.id = c_u.conversation_id and c_u.user_id = :id where shared = true and c_u.id is null and c.name like :search");
+				query = session.createQuery("select c from Conversation c left join Conversation_user c_u on c.id = c_u.conversation_id and c_u.user_id = :id where shared = true and c_u.id is null and c.name like :search and c.chat = false");
 				query.setParameter("search", "%"+search+"%");
 				query.setParameter("id", user_id);
 			}else{
-				query = session.createQuery("select c from Conversation c left join Conversation_User c_u on c.id = c_u.conversation_id and c_u.user_id = :id where shared = true and c_u.id is null");
+				query = session.createQuery("select c from Conversation c left join Conversation_User c_u on c.id = c_u.conversation_id and c_u.user_id = :id where shared = true and c_u.id is null and c.chat = false");
 				query.setParameter("id", user_id);
 			}
 			query.setMaxResults(100);
@@ -168,7 +168,7 @@ public class MessageDAO implements IMessageDAO{
 		Session session = this.sessionFactory.openSession();
 		
 		try{
-			Query query = session.createQuery("select c from Conversation c left join Conversation_User cu on cu.conversation_id = c.id and cu.user_id = :user_id where c.id = :conversation_id");
+			Query query = session.createQuery("select c from Conversation c left join Conversation_User cu on cu.conversation_id = c.id and cu.user_id = :user_id where c.id = :conversation_id and c.chat = false");
 			query.setParameter("conversation_id", conversation_id);
 			query.setParameter("user_id", user.getId());
 			
@@ -273,6 +273,12 @@ public class MessageDAO implements IMessageDAO{
 		}finally{
 			session.close();
 		}
+	}
+	
+	@Override
+	public Conversation findChatConversation(User user, int contact_id) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 	
 	private Contact getContact(int user_id, int contact_id){

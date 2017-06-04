@@ -32,4 +32,5 @@ public interface IMessageJob {
 	public void quitConversation(int conversation_id, User user);
 	public void removeContact(User user, int contact_id) throws Exception;
 	public MessageFile getMessageFile(int id);
+	public List<Message> listChatMessages(User user, int contact_id, int message_id);
 }
