@@ -63,6 +63,19 @@ public class UserDAO implements IUserDAO{
 	}
 	
 	@Override
+	public void setLastLogout(User user) {
+		Session session = this.sessionFactory.openSession();
+		Transaction tx = session.beginTransaction();
+		
+		Query query = session.createQuery("update User set last_logout = NOW() where id = :id");
+		query.setParameter("id", user.getId());
+		
+		query.executeUpdate();
+		tx.commit();
+		session.close();
+	}
+	
+	@Override
 	public User getUser(User u) {
 		Session session = this.sessionFactory.openSession();
 		

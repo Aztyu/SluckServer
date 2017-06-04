@@ -140,8 +140,9 @@ public class UserController {
 		String token = request.getHeader("Authorization");
 		
 		User user = KeyStore.getLoggedUser(token);
-		User db_user = user_job.getUserInfo(user);
-		user_job.setUserStatus(db_user, 3);
+		//User db_user = user_job.getUserInfo(user);
+
+		user_job.disconnect(user);
 		
 		KeyStore.clearToken(token);
 		return new ResponseEntity<>(HttpStatus.OK);

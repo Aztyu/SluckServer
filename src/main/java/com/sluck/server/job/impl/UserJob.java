@@ -85,6 +85,12 @@ public class UserJob implements IUserJob{
 	}
 	
 	@Override
+	public void disconnect(User user) {
+		setUserStatus(user, 3);			//On régle le status en déconnecté
+		user_dao.setLastLogout(user);
+	}
+	
+	@Override
 	public void createResetCode(String email) throws Exception {
 		User user = user_dao.getUserByMail(email);
 		if(user != null){

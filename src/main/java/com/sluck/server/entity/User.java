@@ -1,5 +1,7 @@
 package com.sluck.server.entity;
 
+import java.sql.Timestamp;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -25,6 +27,9 @@ public class User {
 	private String password;
 	private String email;
 	private int status_id;
+	
+	@Column(columnDefinition="TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
+	private Timestamp last_logout;		//Utiliser pour savoir si on a raté des messages
 	
 	@Transient
 	private String token;
@@ -75,5 +80,13 @@ public class User {
 
 	public void setStatus_id(int status_id) {
 		this.status_id = status_id;
+	}
+
+	public Timestamp getLast_logout() {
+		return last_logout;
+	}
+
+	public void setLast_logout(Timestamp last_logout) {
+		this.last_logout = last_logout;
 	}
 }

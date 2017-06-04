@@ -16,4 +16,5 @@ public interface IUserDAO {
 	public void updateUser(User user);
 	public void updateUserStatus(int id, int status_id);
 	public User getUser(int user_id);
+	public void setLastLogout(User user);
 }
