@@ -70,6 +70,26 @@ public class UserController {
 		}
 	}
 	
+	@RequestMapping(value = "/api/update", method = RequestMethod.POST)
+	public @ResponseBody ResponseEntity<?> profileUpdate(HttpServletRequest request, HttpServletResponse response, @RequestParam(name = "file", required = false) MultipartFile file, @RequestParam("user") String user_json){
+		User user = KeyStore.getLoggedUser(request.getHeader("Authorization"));
+		
+		try{
+			ObjectMapper mapper = new ObjectMapper();
+			User new_user = mapper.readValue(user_json, User.class);
+			
+			user_job.updateUser(user, new_user);
+			
+			if(file != null){
+				user_job.saveThumbnail(file, new_user.getId());
+			}
+			
+			return new ResponseEntity<>(new_user, HttpStatus.OK);
+		}catch (Exception e) {
+			return new ResponseEntity<String>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+	
 	@RequestMapping(value = "/login", method = RequestMethod.POST)
 	public @ResponseBody ResponseEntity<?> login(HttpServletRequest request, HttpServletResponse response, @ModelAttribute User user){
 		try{

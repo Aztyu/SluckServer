@@ -75,6 +75,21 @@ public class UserJob implements IUserJob{
 		return logged_user;
 	}
 	
+	@Override
+	public void updateUser(User user, User new_user) {
+		User db_user = user_dao.getUser(user.getId());
+		
+		if(new_user.getEmail() != null){
+			db_user.setEmail(new_user.getEmail());
+		}
+		
+		if(new_user.getPassword() != null){
+			db_user.setPassword(BCrypt.hashpw(new_user.getPassword(), BCrypt.gensalt()));
+		}
+		
+		user_dao.updateUser(db_user);
+	}
+	
 	private void updatePeerID(int user_id, String peerjs_id) {
 		user_dao.updatePeerID(user_id, peerjs_id);
 	}

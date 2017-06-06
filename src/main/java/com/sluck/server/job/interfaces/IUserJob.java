@@ -19,4 +19,5 @@ public interface IUserJob {
 	public void setUserStatus(User user, int status_id);
 	public User getUserInfo(User user);
 	public void disconnect(User user);
+	public void updateUser(User user, User new_user);
 }
