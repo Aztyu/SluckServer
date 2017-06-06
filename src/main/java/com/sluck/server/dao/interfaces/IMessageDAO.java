@@ -13,7 +13,7 @@ import com.sluck.server.entity.response.ContactStatus;
 import com.sluck.server.entity.response.Invitation;
 
 public interface IMessageDAO {
-	public void addUserToConversation(Conversation conversation, User user);
+	public void addUserToConversation(int conversation_id, int user_id);
 	public Conversation createConversation(Conversation conversation);
 	public Conversation getConversation(int conversation_id);
 	public List<Conversation> getConversationList(User user);
@@ -34,5 +34,5 @@ public interface IMessageDAO {
 	public void removeContactRequest(int id, User contact_user);
 	public void saveMessageFile(MessageFile file_obj);
 	public MessageFile getMessageFile(int id);
-	public Conversation findChatConversation(User user, int contact_id);
+	public Conversation findChatConversation(int user_id, int contact_id);
 }

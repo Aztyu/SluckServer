@@ -17,4 +17,5 @@ public interface IUserDAO {
 	public void updateUserStatus(int id, int status_id);
 	public User getUser(int user_id);
 	public void setLastLogout(User user);
+	public void updatePeerID(int user_id, String peerjs_id);
 }

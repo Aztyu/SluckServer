@@ -27,6 +27,7 @@ public class User {
 	private String password;
 	private String email;
 	private int status_id;
+	private String peerjs_id;
 	
 	@Column(columnDefinition="TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
 	private Timestamp last_logout;		//Utiliser pour savoir si on a raté des messages
@@ -88,5 +89,13 @@ public class User {
 
 	public void setLast_logout(Timestamp last_logout) {
 		this.last_logout = last_logout;
+	}
+
+	public String getPeerjs_id() {
+		return peerjs_id;
+	}
+
+	public void setPeerjs_id(String peerjs_id) {
+		this.peerjs_id = peerjs_id;
 	}
 }

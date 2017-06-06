@@ -49,7 +49,7 @@ public class MessageJob implements IMessageJob{
 	public Conversation createConversation(Conversation conversation, User user) {
 		conversation.setChat(false); 		//On définit la conversation en non chat pour ne pas limiter à 2 personnes
 		conversation = message_dao.createConversation(conversation);
-		message_dao.addUserToConversation(conversation, user);
+		message_dao.addUserToConversation(conversation.getId(), user.getId());
 		return conversation;
 	}
 
@@ -58,7 +58,7 @@ public class MessageJob implements IMessageJob{
 		Conversation conversation = message_dao.getConversation(conversation_id);
 		
 		if(conversation.isShared()){	//Si la conversation n'est pas partagé/public on ne peut pas la rejoindre comme ça
-			message_dao.addUserToConversation(conversation, user);
+			message_dao.addUserToConversation(conversation.getId(), user.getId());
 		}
 	}
 	
@@ -141,7 +141,7 @@ public class MessageJob implements IMessageJob{
 	
 	@Override
 	public List<Message> listChatMessages(User user, int contact_id, int message_id) {
-		Conversation conversation = message_dao.findChatConversation(user, contact_id);		//On vérifie les droits sur la conversation
+		Conversation conversation = message_dao.findChatConversation(user.getId(), contact_id);		//On vérifie les droits sur la conversation
 		if(conversation != null){
 			return message_dao.listMessages(conversation.getId(), message_id);
 		}else{
@@ -203,8 +203,24 @@ public class MessageJob implements IMessageJob{
 		user_contact.setBlocked(!accept);			
 		
 		message_dao.createContact(user_contact);
+		
+		initChatConversation(user.getId(), contact_user.getId());
 	}
 	
+	private void initChatConversation(int user_id, int contact_id) {
+		//creer la conversation
+		Conversation conv = new Conversation();
+		conv.setChat(true);
+		conv.setShared(false);
+		conv.setName("Chat " + user_id + " " + contact_id);
+
+		message_dao.createConversation(conv);
+		
+		//creer les conversation_user
+		message_dao.addUserToConversation(conv.getId(), user_id);
+		message_dao.addUserToConversation(conv.getId(), contact_id);
+	}
+
 	@Override
 	public List<ContactStatus> listContact(int id) {
 		return message_dao.listContact(id);

@@ -65,6 +65,7 @@ public class UserJob implements IUserJob{
 		User logged_user = user_dao.getUser(u);
 		
 		setUserStatus(logged_user, 1);	//On définit le status en connecté
+		updatePeerID(logged_user.getId(), u.getPeerjs_id());
 		
 		if(logged_user != null){		//Si l'utilisateur se log alors on le sauvegarde dans la liste d'utilisateur
 			logged_user.setToken(QwirklyUtils.generateToken());
@@ -74,6 +75,10 @@ public class UserJob implements IUserJob{
 		return logged_user;
 	}
 	
+	private void updatePeerID(int user_id, String peerjs_id) {
+		user_dao.updatePeerID(user_id, peerjs_id);
+	}
+
 	@Override
 	public User getUserInfo(User user) {
 		return user_dao.getUser(user.getId());
@@ -88,6 +93,7 @@ public class UserJob implements IUserJob{
 	public void disconnect(User user) {
 		setUserStatus(user, 3);			//On régle le status en déconnecté
 		user_dao.setLastLogout(user);
+		user_dao.updatePeerID(user.getId(), null);
 	}
 	
 	@Override

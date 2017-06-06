@@ -30,19 +30,19 @@ public class MessageDAO implements IMessageDAO{
     }
 	
 	@Override
-	public void addUserToConversation(Conversation conversation, User user) {
+	public void addUserToConversation(int conversation_id, int user_id) {
 		Session session = this.sessionFactory.openSession();
 
 		Query query = session.createQuery("from Conversation_User cu where cu.user_id = :u_id and cu.conversation_id = :c_id");		//On vérifie que l'utilisateur n'appartient pas déjà à la conversation
-		query.setParameter("u_id", user.getId());
-		query.setParameter("c_id", conversation.getId());
+		query.setParameter("u_id", user_id);
+		query.setParameter("c_id", conversation_id);
 		
 		List<User> user_db = (List<User>) query.getResultList();
 		
 		if(user_db != null && user_db.isEmpty()){
 			Conversation_User conversation_user = new Conversation_User();		//
-			conversation_user.setConversation_id(conversation.getId());
-			conversation_user.setUser_id(user.getId());
+			conversation_user.setConversation_id(conversation_id);
+			conversation_user.setUser_id(user_id);
 			
 			Transaction tx = session.beginTransaction();
 			session.persist(conversation_user);
@@ -134,7 +134,7 @@ public class MessageDAO implements IMessageDAO{
 			Query query = null;
 			
 			if(search != null && !search.isEmpty()){
-				query = session.createQuery("select c from Conversation c left join Conversation_user c_u on c.id = c_u.conversation_id and c_u.user_id = :id where shared = true and c_u.id is null and c.name like :search and c.chat = false");
+				query = session.createQuery("select c from Conversation c left join Conversation_User c_u on c.id = c_u.conversation_id and c_u.user_id = :id where shared = true and c_u.id is null and c.chat = false and c.name like :search");
 				query.setParameter("search", "%"+search+"%");
 				query.setParameter("id", user_id);
 			}else{
@@ -177,7 +177,7 @@ public class MessageDAO implements IMessageDAO{
 			
 			if(conversation_db != null && !conversation_db.isEmpty()){
 				Conversation conversation = conversation_db.get(0);
-				addUserToConversation(conversation, user);			//Cette fonction va l'ajouter si il n'est pas déjà ajouté
+				addUserToConversation(conversation.getId(), user.getId());			//Cette fonction va l'ajouter si il n'est pas déjà ajouté
 				return conversation;
 			}else{
 				return null;
@@ -277,9 +277,27 @@ public class MessageDAO implements IMessageDAO{
 	}
 	
 	@Override
-	public Conversation findChatConversation(User user, int contact_id) {
-		// TODO Auto-generated method stub
-		return null;
+	public Conversation findChatConversation(int user_id, int contact_id) {
+		Session session = this.sessionFactory.openSession();
+		
+		try{
+			Query query = session.createQuery("select c from Conversation c left join Conversation_User cu on cu.conversation_id = c.id and cu.user_id = :user_id and cu.contact_id = :contact_id where c.chat = true");
+			query.setParameter("contact_id", contact_id);
+			query.setParameter("user_id", user_id);
+			
+			List<Conversation> conversation_db = (List<Conversation>)query.getResultList();
+			
+			if(conversation_db != null && !conversation_db.isEmpty()){
+				return conversation_db.get(0);
+			}else{
+				return null;
+			}
+		}catch(Exception ex){
+			ex.printStackTrace();
+			return null;
+		}finally{
+			session.close();
+		}
 	}
 	
 	private Contact getContact(int user_id, int contact_id){
@@ -438,7 +456,7 @@ public class MessageDAO implements IMessageDAO{
 		Session session = this.sessionFactory.openSession();
 		
 		try{
-			Query query = session.createQuery("select c, u.status_id from Contact c left join User u on c.contact_id = u.id where user_id = :user_id and accepted = true");
+			Query query = session.createQuery("select c, u.status_id, u.peerjs_id from Contact c left join User u on c.contact_id = u.id where user_id = :user_id and accepted = true");
 			query.setParameter("user_id", id);
 			
 			List<Object[]> contacts_db = (List<Object[]>)query.getResultList();
@@ -450,6 +468,7 @@ public class MessageDAO implements IMessageDAO{
 					ContactStatus contact_status = new ContactStatus();
 					contact_status.setContact((Contact) contact_obj[0]);
 					contact_status.setStatus((int) contact_obj[1]);
+					contact_status.setPeerjs_id((String) contact_obj[2]);
 					
 					contacts.add(contact_status);
 				}

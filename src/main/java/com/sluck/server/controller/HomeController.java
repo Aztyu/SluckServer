@@ -25,7 +25,6 @@ import com.sluck.server.entity.Response;
 @Controller
 public class HomeController {
 	
-	
 	private static final Logger logger = LoggerFactory.getLogger(HomeController.class);
 	
 	private static List<Message> messages = new ArrayList<>();

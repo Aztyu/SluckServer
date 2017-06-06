@@ -63,6 +63,20 @@ public class UserDAO implements IUserDAO{
 	}
 	
 	@Override
+	public void updatePeerID(int user_id, String peerjs_id) {
+		Session session = this.sessionFactory.openSession();
+		Transaction tx = session.beginTransaction();
+		
+		Query query = session.createQuery("update User set peerjs_id = :peerjs_id where id = :id");
+		query.setParameter("peerjs_id", peerjs_id);
+		query.setParameter("id", user_id);
+		
+		query.executeUpdate();
+		tx.commit();
+		session.close();
+	}
+	
+	@Override
 	public void setLastLogout(User user) {
 		Session session = this.sessionFactory.openSession();
 		Transaction tx = session.beginTransaction();
@@ -170,7 +184,7 @@ public class UserDAO implements IUserDAO{
 	public User getUserDetail(int id) {
 		Session session = this.sessionFactory.openSession();
 		
-		Query query = session.createQuery("select u.name, u.id from User u where u.id = :id");
+		Query query = session.createQuery("select u.name, u.id, u.peerjs_id from User u where u.id = :id");
 		query.setParameter("id", id);
 		List<Object[]> user_db = (List<Object[]>) query.getResultList();
 		
@@ -180,6 +194,7 @@ public class UserDAO implements IUserDAO{
 			User user = new User();
 			user.setName((String) obj[0]);
 			user.setId((int) obj[1]);
+			user.setPeerjs_id((String) obj[2]);
 			
 			return user;
 		}else{
