@@ -281,7 +281,7 @@ public class MessageDAO implements IMessageDAO{
 		Session session = this.sessionFactory.openSession();
 		
 		try{
-			Query query = session.createQuery("select c from Conversation c left join Conversation_User cu on cu.conversation_id = c.id and cu.user_id = :user_id and cu.contact_id = :contact_id where c.chat = true");
+			Query query = session.createQuery("select c from Conversation c left join Conversation_User cu on cu.conversation_id = c.id left join Conversation_User cu1 on cu1.conversation_id = c.id where cu.user_id = :user_id and cu1.user_id = :contact_id and c.chat = true");
 			query.setParameter("contact_id", contact_id);
 			query.setParameter("user_id", user_id);
 			
