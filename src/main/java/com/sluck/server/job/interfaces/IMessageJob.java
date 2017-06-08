@@ -28,7 +28,6 @@ public interface IMessageJob {
 	public List<Invitation> getInvitationList(User user);
 	public void updateInvitation(User user, int contact_id, boolean accept);
 	public List<ContactStatus> listContact(int id);
-	public void renameContact(int id, User contact) throws Exception;
 	public List<ContactSearch> searchContact(User user, String search);
 	public void quitConversation(int conversation_id, User user);
 	public void removeContact(User user, int contact_id) throws Exception;
@@ -37,4 +36,5 @@ public interface IMessageJob {
 	public void inviteToConversation(User user, int conversation_id, int user_id);
 	public List<Conversation_Invitation> getConversationInvitationList(User user);
 	public void updateConvInvitation(User user, int invitation_id, boolean b);
+	public void renameContact(int id, String name, int contact_id) throws Exception;
 }

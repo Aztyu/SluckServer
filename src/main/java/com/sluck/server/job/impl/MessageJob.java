@@ -264,11 +264,11 @@ public class MessageJob implements IMessageJob{
 	}
 	
 	@Override
-	public void renameContact(int user_id, User contact) throws Exception {
-		Contact contact_db = message_dao.getContactForUser(user_id, contact.getId());
+	public void renameContact(int user_id, String contact_name, int contact_id) throws Exception {
+		Contact contact_db = message_dao.getContactForUser(user_id, contact_id);
 		
 		if(contact_db != null){
-			contact_db.setName(contact.getName());		//On change le nom du contact
+			contact_db.setName(contact_name);		//On change le nom du contact
 			message_dao.updateContact(contact_db);
 		}else{
 			throw new Exception("Contact inexistant");

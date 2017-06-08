@@ -284,12 +284,12 @@ public class ApiController {
 		}
 	}
 	
-	@RequestMapping(value = "/api/contact/rename", method = RequestMethod.POST)
-	public @ResponseBody ResponseEntity<?> renameContact(HttpServletRequest request, @ModelAttribute User contact){
+	@RequestMapping(value = "/api/contact/rename/{contact_id}", method = RequestMethod.POST)
+	public @ResponseBody ResponseEntity<?> renameContact(HttpServletRequest request, @RequestParam String name, @PathVariable int contact_id){
 		User user = KeyStore.getLoggedUser(request.getHeader("Authorization"));
 
 		try{
-			message_job.renameContact(user.getId(), contact);
+			message_job.renameContact(user.getId(), name, contact_id);
 			return new ResponseEntity<>(HttpStatus.OK);
 		}catch(Exception ex){
 			return new ResponseEntity<>(ex.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR); 
