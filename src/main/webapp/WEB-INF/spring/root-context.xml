@@ -33,6 +33,7 @@
 				<value>com.sluck.server.entity.User</value>
 				<value>com.sluck.server.entity.Conversation</value>
 				<value>com.sluck.server.entity.Conversation_User</value>
+				<value>com.sluck.server.entity.Conversation_Invitation</value>
 				<value>com.sluck.server.entity.Message</value>
 				<value>com.sluck.server.entity.MessageFile</value>
 				<value>com.sluck.server.entity.Contact</value>

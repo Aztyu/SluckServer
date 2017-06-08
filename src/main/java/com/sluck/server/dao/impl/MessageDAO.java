@@ -14,6 +14,7 @@ import org.springframework.stereotype.Component;
 import com.sluck.server.dao.interfaces.IMessageDAO;
 import com.sluck.server.entity.Contact;
 import com.sluck.server.entity.Conversation;
+import com.sluck.server.entity.Conversation_Invitation;
 import com.sluck.server.entity.Conversation_User;
 import com.sluck.server.entity.Message;
 import com.sluck.server.entity.MessageFile;
@@ -61,6 +62,16 @@ public class MessageDAO implements IMessageDAO{
 		session.close();
 		
 		return conversation;
+	}
+	
+	@Override
+	public void saveConversationInvitation(Conversation_Invitation conv_inv) {
+		Session session = this.sessionFactory.openSession();
+		
+		Transaction tx = session.beginTransaction();
+		session.persist(conv_inv);
+		tx.commit();
+		session.close();
 	}
 	
 	@Override
@@ -127,6 +138,24 @@ public class MessageDAO implements IMessageDAO{
 	}
 	
 	@Override
+	public List<Conversation_Invitation> getConversationInvitationList(User user) {
+		Session session = this.sessionFactory.openSession();
+		
+		try{
+			Query query = session.createQuery("select c from Conversation_Invitation c where c.user_id = :id and c.accepted = false");
+			query.setParameter("id", user.getId());
+			List<Conversation_Invitation> conversation_db = (List<Conversation_Invitation>) query.getResultList();
+			
+			return conversation_db;
+		}catch(Exception ex){
+			ex.printStackTrace();
+			return null;
+		}finally{
+			session.close();
+		}
+	}
+	
+	@Override
 	public List<Conversation> searchConversation(String search, int user_id) {
 		Session session = this.sessionFactory.openSession();
 
@@ -151,6 +180,23 @@ public class MessageDAO implements IMessageDAO{
 			return null;
 		}finally{
 			session.close();
+		}
+	}
+	
+	@Override
+	public Conversation_Invitation getConversationInvitation(int invitation_id) {
+		Session session = null;
+		try{ 
+			session = this.sessionFactory.openSession();
+			Transaction tx = session.beginTransaction();
+			return session.find(Conversation_Invitation.class, invitation_id);
+		}catch(Exception ex){
+			ex.printStackTrace();
+			return null;
+		}finally{
+			if(session != null){
+				session.close();
+			}
 		}
 	}
 	
@@ -362,6 +408,18 @@ public class MessageDAO implements IMessageDAO{
 		try(Session session = this.sessionFactory.openSession()){
 			Transaction tx = session.beginTransaction();
 			session.remove(contact);
+			tx.commit();
+			session.close();
+		}
+	}
+	
+	@Override
+	public void removeContactInvitation(int invitation_id) {
+		Conversation_Invitation conv_invit = getConversationInvitation(invitation_id);
+		
+		try(Session session = this.sessionFactory.openSession()){
+			Transaction tx = session.beginTransaction();
+			session.remove(conv_invit);
 			tx.commit();
 			session.close();
 		}

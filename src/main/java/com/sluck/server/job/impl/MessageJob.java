@@ -16,6 +16,7 @@ import com.sluck.server.dao.interfaces.IMessageDAO;
 import com.sluck.server.dao.interfaces.IUserDAO;
 import com.sluck.server.entity.Contact;
 import com.sluck.server.entity.Conversation;
+import com.sluck.server.entity.Conversation_Invitation;
 import com.sluck.server.entity.Conversation_User;
 import com.sluck.server.entity.Message;
 import com.sluck.server.entity.MessageFile;
@@ -72,8 +73,31 @@ public class MessageJob implements IMessageJob{
 	}
 	
 	@Override
+	public void inviteToConversation(User user, int conversation_id, int user_id) {
+		Conversation conv = message_dao.hasConversationAccess(user, conversation_id);	//On vérifie que l'utilisateur connecté appartient à la conversation
+		
+		if(conv != null){
+			createInvitation(conversation_id, user_id);
+		}
+	}
+	
+	private void createInvitation(int conversation_id, int user_id) {
+		Conversation_Invitation conv_inv = new Conversation_Invitation();
+		conv_inv.setConversation_id(conversation_id);
+		conv_inv.setUser_id(user_id);
+		conv_inv.setAccepted(false);
+		
+		message_dao.saveConversationInvitation(conv_inv);
+	}
+
+	@Override
 	public List<Conversation> getConversationList(User user) {
 		return message_dao.getConversationList(user);
+	}
+	
+	@Override
+	public List<Conversation_Invitation> getConversationInvitationList(User user) {
+		return message_dao.getConversationInvitationList(user);
 	}
 	
 	@Override
@@ -205,6 +229,19 @@ public class MessageJob implements IMessageJob{
 		message_dao.createContact(user_contact);
 		
 		initChatConversation(user.getId(), contact_user.getId());
+	}
+	
+	@Override
+	public void updateConvInvitation(User user, int invitation_id, boolean b) {
+		Conversation_Invitation conv_invit = message_dao.getConversationInvitation(invitation_id);
+		
+		if(conv_invit != null && conv_invit.getUser_id() == user.getId()){		//On vérifie que l'invitation existe et qu'elle concerne l'utilisateur
+			if(b){
+				message_dao.addUserToConversation(conv_invit.getConversation_id(), user.getId());
+			}else{
+				message_dao.removeContactInvitation(invitation_id);
+			}
+		}
 	}
 	
 	private void initChatConversation(int user_id, int contact_id) {

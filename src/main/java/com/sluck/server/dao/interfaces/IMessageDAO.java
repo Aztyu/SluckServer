@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.sluck.server.entity.Contact;
 import com.sluck.server.entity.Conversation;
+import com.sluck.server.entity.Conversation_Invitation;
 import com.sluck.server.entity.Conversation_User;
 import com.sluck.server.entity.Message;
 import com.sluck.server.entity.MessageFile;
@@ -35,4 +36,8 @@ public interface IMessageDAO {
 	public void saveMessageFile(MessageFile file_obj);
 	public MessageFile getMessageFile(int id);
 	public Conversation findChatConversation(int user_id, int contact_id);
+	public void saveConversationInvitation(Conversation_Invitation conv_inv);
+	public List<Conversation_Invitation> getConversationInvitationList(User user);
+	public Conversation_Invitation getConversationInvitation(int invitation_id);
+	public void removeContactInvitation(int invitation_id);
 }

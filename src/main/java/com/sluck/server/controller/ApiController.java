@@ -30,6 +30,7 @@ import org.springframework.web.multipart.commons.CommonsMultipartFile;
 
 import com.sluck.server.entity.Contact;
 import com.sluck.server.entity.Conversation;
+import com.sluck.server.entity.Conversation_Invitation;
 import com.sluck.server.entity.Message;
 import com.sluck.server.entity.MessageFile;
 import com.sluck.server.entity.User;
@@ -87,11 +88,42 @@ public class ApiController {
 		return message_job.getConversationList(user);	
 	}
 	
+	@RequestMapping(value = "/api/conversation/invite/list", method = RequestMethod.GET)
+	public @ResponseBody List<Conversation_Invitation> listConversationInvitation(HttpServletRequest request){
+		User user = KeyStore.getLoggedUser(request.getHeader("Authorization"));
+		
+		return message_job.getConversationInvitationList(user);	
+	}
+	
 	@RequestMapping(value = "/api/conversation/join/{conversation_id}", method = RequestMethod.GET)
 	public @ResponseBody void joinConversation(HttpServletRequest request, @PathVariable int conversation_id){
 		User user = KeyStore.getLoggedUser(request.getHeader("Authorization"));
 		
 		message_job.joinConversation(conversation_id, user);
+	}
+	
+	@RequestMapping(value = "/api/conversation/invitation/{invitation_id}", method = RequestMethod.POST)
+	public @ResponseBody ResponseEntity<?> acceptConvInvitation(HttpServletRequest request, @PathVariable int invitation_id){
+		User user = KeyStore.getLoggedUser(request.getHeader("Authorization"));
+
+		try{
+			message_job.updateConvInvitation(user, invitation_id, true);
+			return new ResponseEntity<>(HttpStatus.OK);
+		}catch(Exception ex){
+			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR); 
+		}
+	}
+	
+	@RequestMapping(value = "/api/conversation/invitation/{invitation_id}", method = RequestMethod.DELETE)
+	public @ResponseBody ResponseEntity<?> refuseConvInvitation(HttpServletRequest request, @PathVariable int invitation_id){
+		User user = KeyStore.getLoggedUser(request.getHeader("Authorization"));
+
+		try{
+			message_job.updateConvInvitation(user, invitation_id, false);
+			return new ResponseEntity<>(HttpStatus.OK);
+		}catch(Exception ex){
+			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR); 
+		}
 	}
 	
 	@RequestMapping(value = "/api/conversation/search", method = RequestMethod.GET)
@@ -107,6 +139,18 @@ public class ApiController {
 		
 		try{
 			message_job.quitConversation(conversation_id, user);
+			return new ResponseEntity<>(HttpStatus.OK);
+		}catch(Exception ex){
+			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR); 
+		}
+	}
+	
+	@RequestMapping(value = "/api/conversation/invite/{conversation_id}/{user_id}", method = RequestMethod.POST)
+	public @ResponseBody ResponseEntity<?> inviteToConversation(HttpServletRequest request, @PathVariable int conversation_id, @PathVariable int user_id){
+		User user = KeyStore.getLoggedUser(request.getHeader("Authorization"));
+		
+		try{
+			message_job.inviteToConversation(user, conversation_id, user_id);
 			return new ResponseEntity<>(HttpStatus.OK);
 		}catch(Exception ex){
 			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR); 

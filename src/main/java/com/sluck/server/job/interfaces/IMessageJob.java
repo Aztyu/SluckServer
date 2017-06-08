@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 
 import com.sluck.server.entity.Contact;
 import com.sluck.server.entity.Conversation;
+import com.sluck.server.entity.Conversation_Invitation;
 import com.sluck.server.entity.Message;
 import com.sluck.server.entity.MessageFile;
 import com.sluck.server.entity.User;
@@ -33,4 +34,7 @@ public interface IMessageJob {
 	public void removeContact(User user, int contact_id) throws Exception;
 	public MessageFile getMessageFile(int id);
 	public List<Message> listChatMessages(User user, int contact_id, int message_id);
+	public void inviteToConversation(User user, int conversation_id, int user_id);
+	public List<Conversation_Invitation> getConversationInvitationList(User user);
+	public void updateConvInvitation(User user, int invitation_id, boolean b);
 }
