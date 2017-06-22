@@ -27,9 +27,9 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.sluck.server.dao.interfaces.IUserDAO;
 import com.sluck.server.entity.Reset;
+import com.sluck.server.entity.Token;
 import com.sluck.server.entity.User;
 import com.sluck.server.job.interfaces.IUserJob;
-import com.sluck.server.security.KeyStore;
 import com.sluck.server.security.PropertiesLoader;
 import com.sluck.server.util.MailUtil;
 import com.sluck.server.util.QwirklyUtils;
@@ -69,10 +69,17 @@ public class UserJob implements IUserJob{
 		
 		if(logged_user != null){		//Si l'utilisateur se log alors on le sauvegarde dans la liste d'utilisateur
 			logged_user.setToken(QwirklyUtils.generateToken());
-			KeyStore.storeToken(logged_user.getToken(), logged_user);
+			user_dao.saveToken(logged_user.getToken(), logged_user.getId());
+			//KeyStore.storeToken(logged_user.getToken(), logged_user);
 		}
 		
 		return logged_user;
+	}
+	
+	@Override
+	public User getLoggedUser(String token) {
+		Token tok = user_dao.findTokenUser(token);
+		return user_dao.getUser(tok.getUser_id());
 	}
 	
 	@Override
@@ -105,10 +112,13 @@ public class UserJob implements IUserJob{
 	}
 	
 	@Override
-	public void disconnect(User user) {
+	public void disconnect(User user, String token) {
 		setUserStatus(user, 3);			//On régle le status en déconnecté
 		user_dao.setLastLogout(user);
 		user_dao.updatePeerID(user.getId(), null);
+		
+		Token tok = user_dao.findTokenUser(token);
+		user_dao.deleteToken(tok);
 	}
 	
 	@Override

@@ -18,6 +18,7 @@ public interface IUserJob {
 	public void resetPassword(String code, String password) throws Exception;
 	public void setUserStatus(User user, int status_id);
 	public User getUserInfo(User user);
-	public void disconnect(User user);
+	public void disconnect(User user, String token);
 	public void updateUser(User user, User new_user);
+	public User getLoggedUser(String token);
 }

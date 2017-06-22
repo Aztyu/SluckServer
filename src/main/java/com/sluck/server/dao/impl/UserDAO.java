@@ -12,6 +12,7 @@ import org.springframework.stereotype.Component;
 
 import com.sluck.server.dao.interfaces.IUserDAO;
 import com.sluck.server.entity.Reset;
+import com.sluck.server.entity.Token;
 import com.sluck.server.entity.User;
 import com.sluck.server.util.QwirklyUtils;
 
@@ -37,6 +38,21 @@ public class UserDAO implements IUserDAO{
 			tx.commit();
 			session.close();
 		}
+	}
+	
+	@Override
+	public void saveToken(String generateToken, int id) {
+		Session session = this.sessionFactory.openSession();
+		
+		Token token = new Token();
+		token.setToken(generateToken);
+		token.setUser_id(id);
+		
+		// TODO Auto-generated method stub
+		Transaction tx = session.beginTransaction();
+		session.persist(token);
+		tx.commit();
+		session.close();
 	}
 	
 	@Override
@@ -122,6 +138,31 @@ public class UserDAO implements IUserDAO{
 		}else{
 			return null;
 		}
+	}
+	
+	@Override
+	public Token findTokenUser(String token) {
+		Session session = this.sessionFactory.openSession();
+		
+		Query query = session.createQuery("from Token t where t.token = :token");
+		query.setParameter("token", token);
+		List<Token> token_db = (List<Token>) query.getResultList();
+		
+		if(token_db != null && !token_db.isEmpty()){
+			return token_db.get(0);
+		}else{
+			return null;
+		}
+	}
+	
+	@Override
+	public void deleteToken(Token token) {
+		Session session = this.sessionFactory.openSession();
+		
+		Transaction tx = session.beginTransaction();
+		session.delete(token);
+		tx.commit();
+		session.close();
 	}
 	
 	@Override

@@ -37,7 +37,6 @@ import com.sluck.server.entity.User;
 import com.sluck.server.entity.response.Invitation;
 import com.sluck.server.job.interfaces.IMessageJob;
 import com.sluck.server.job.interfaces.IUserJob;
-import com.sluck.server.security.KeyStore;
 
 @Controller
 public class ApiController {
@@ -49,7 +48,7 @@ public class ApiController {
 	
 	@RequestMapping(value = "/api/test", method = RequestMethod.GET)
 	public @ResponseBody String postMessage(HttpServletRequest request, Model model){	//@ModelAttribute permet de récupérer les données directement dans un objet message
-		System.out.println(KeyStore.getLoggedUser(request.getHeader("Authorization")).getId());
+		System.out.println(user_job.getLoggedUser(request.getHeader("Authorization")).getId());
 		
 		return "It's working";
 	}
@@ -58,14 +57,14 @@ public class ApiController {
 	
 	@RequestMapping(value = "/api/user/detail/{id}", method = RequestMethod.GET)
 	public @ResponseBody User getUserDetail(HttpServletRequest request, @PathVariable int id){
-		User user = KeyStore.getLoggedUser(request.getHeader("Authorization"));
+		User user = user_job.getLoggedUser(request.getHeader("Authorization"));
 		
 		return message_job.getUserDetail(id);	
 	}
 	
 	@RequestMapping(value = "/api/user/status/{status_id}", method = RequestMethod.GET)
 	public @ResponseBody void setUserStatus(HttpServletRequest request, @PathVariable int status_id){
-		User user = KeyStore.getLoggedUser(request.getHeader("Authorization"));
+		User user = user_job.getLoggedUser(request.getHeader("Authorization"));
 		
 		user_job.setUserStatus(user, status_id);	
 	}
@@ -74,7 +73,7 @@ public class ApiController {
 	
 	@RequestMapping(value = "/api/conversation/create", method = RequestMethod.POST)
 	public @ResponseBody Conversation createConversation(HttpServletRequest request, @ModelAttribute Conversation conversation){
-		User user = KeyStore.getLoggedUser(request.getHeader("Authorization"));
+		User user = user_job.getLoggedUser(request.getHeader("Authorization"));
 		
 		conversation = message_job.createConversation(conversation, user);
 		
@@ -83,28 +82,28 @@ public class ApiController {
 	
 	@RequestMapping(value = "/api/conversation/list", method = RequestMethod.GET)
 	public @ResponseBody List<Conversation> listConversation(HttpServletRequest request){
-		User user = KeyStore.getLoggedUser(request.getHeader("Authorization"));
+		User user = user_job.getLoggedUser(request.getHeader("Authorization"));
 		
 		return message_job.getConversationList(user);	
 	}
 	
 	@RequestMapping(value = "/api/conversation/invite/list", method = RequestMethod.GET)
 	public @ResponseBody List<Conversation_Invitation> listConversationInvitation(HttpServletRequest request){
-		User user = KeyStore.getLoggedUser(request.getHeader("Authorization"));
+		User user = user_job.getLoggedUser(request.getHeader("Authorization"));
 		
 		return message_job.getConversationInvitationList(user);	
 	}
 	
 	@RequestMapping(value = "/api/conversation/join/{conversation_id}", method = RequestMethod.GET)
 	public @ResponseBody void joinConversation(HttpServletRequest request, @PathVariable int conversation_id){
-		User user = KeyStore.getLoggedUser(request.getHeader("Authorization"));
+		User user = user_job.getLoggedUser(request.getHeader("Authorization"));
 		
 		message_job.joinConversation(conversation_id, user);
 	}
 	
 	@RequestMapping(value = "/api/conversation/invitation/{invitation_id}", method = RequestMethod.POST)
 	public @ResponseBody ResponseEntity<?> acceptConvInvitation(HttpServletRequest request, @PathVariable int invitation_id){
-		User user = KeyStore.getLoggedUser(request.getHeader("Authorization"));
+		User user = user_job.getLoggedUser(request.getHeader("Authorization"));
 
 		try{
 			message_job.updateConvInvitation(user, invitation_id, true);
@@ -116,7 +115,7 @@ public class ApiController {
 	
 	@RequestMapping(value = "/api/conversation/invitation/{invitation_id}", method = RequestMethod.DELETE)
 	public @ResponseBody ResponseEntity<?> refuseConvInvitation(HttpServletRequest request, @PathVariable int invitation_id){
-		User user = KeyStore.getLoggedUser(request.getHeader("Authorization"));
+		User user = user_job.getLoggedUser(request.getHeader("Authorization"));
 
 		try{
 			message_job.updateConvInvitation(user, invitation_id, false);
@@ -128,14 +127,14 @@ public class ApiController {
 	
 	@RequestMapping(value = "/api/conversation/search", method = RequestMethod.GET)
 	public @ResponseBody List<Conversation> searchConversation(HttpServletRequest request, @RequestParam(required = false) String search){
-		User user = KeyStore.getLoggedUser(request.getHeader("Authorization"));
+		User user = user_job.getLoggedUser(request.getHeader("Authorization"));
 		
 		return message_job.searchConversation(search, user.getId());
 	}
 	
 	@RequestMapping(value = "/api/conversation/quit/{conversation_id}", method = RequestMethod.DELETE)
 	public @ResponseBody ResponseEntity<?> quitConversation(HttpServletRequest request, @PathVariable int conversation_id){
-		User user = KeyStore.getLoggedUser(request.getHeader("Authorization"));
+		User user = user_job.getLoggedUser(request.getHeader("Authorization"));
 		
 		try{
 			message_job.quitConversation(conversation_id, user);
@@ -147,7 +146,7 @@ public class ApiController {
 	
 	@RequestMapping(value = "/api/conversation/invite/{conversation_id}/{user_id}", method = RequestMethod.POST)
 	public @ResponseBody ResponseEntity<?> inviteToConversation(HttpServletRequest request, @PathVariable int conversation_id, @PathVariable int user_id){
-		User user = KeyStore.getLoggedUser(request.getHeader("Authorization"));
+		User user = user_job.getLoggedUser(request.getHeader("Authorization"));
 		
 		try{
 			message_job.inviteToConversation(user, conversation_id, user_id);
@@ -161,7 +160,7 @@ public class ApiController {
 	
 	@RequestMapping(value = "/api/message/send/{conversation_id}", method = RequestMethod.POST)
 	public @ResponseBody Message sendMessage(HttpServletRequest request, @PathVariable int conversation_id, @RequestParam(name = "file", required = false) CommonsMultipartFile file, @RequestParam(name = "message", required = false) String content){
-		User user = KeyStore.getLoggedUser(request.getHeader("Authorization"));
+		User user = user_job.getLoggedUser(request.getHeader("Authorization"));
 		
 		try{
 			Message message = new Message();
@@ -206,14 +205,14 @@ public class ApiController {
 	
 	@RequestMapping(value = "/api/message/list/{conversation_id}/{message_id}", method = RequestMethod.GET)
 	public @ResponseBody List<Message> listMessage(HttpServletRequest request, @PathVariable int conversation_id, @PathVariable int message_id){
-		User user = KeyStore.getLoggedUser(request.getHeader("Authorization"));
+		User user = user_job.getLoggedUser(request.getHeader("Authorization"));
 		
 		return message_job.listMessages(user, conversation_id, message_id);
 	}
 	
 	@RequestMapping(value = "/api/message/chat/{contact_id}/{message_id}", method = RequestMethod.GET)
 	public @ResponseBody List<Message> listChatMessage(HttpServletRequest request, @PathVariable int contact_id, @PathVariable int message_id){
-		User user = KeyStore.getLoggedUser(request.getHeader("Authorization"));
+		User user = user_job.getLoggedUser(request.getHeader("Authorization"));
 		
 		return message_job.listChatMessages(user, contact_id, message_id);
 	}
@@ -222,7 +221,7 @@ public class ApiController {
 	
 	@RequestMapping(value = "/api/contact/add/{contact_id}", method = RequestMethod.POST)
 	public @ResponseBody ResponseEntity<?> addContact(HttpServletRequest request, @PathVariable int contact_id){
-		User user = KeyStore.getLoggedUser(request.getHeader("Authorization"));
+		User user = user_job.getLoggedUser(request.getHeader("Authorization"));
 		try{
 			message_job.addContact(user, contact_id);
 			return new ResponseEntity<>(HttpStatus.OK);
@@ -233,7 +232,7 @@ public class ApiController {
 	
 	@RequestMapping(value = "/api/contact/remove/{contact_id}", method = RequestMethod.POST)
 	public @ResponseBody ResponseEntity<?> removeContact(HttpServletRequest request, @PathVariable int contact_id){
-		User user = KeyStore.getLoggedUser(request.getHeader("Authorization"));
+		User user = user_job.getLoggedUser(request.getHeader("Authorization"));
 		try{
 			message_job.removeContact(user, contact_id);
 			return new ResponseEntity<>(HttpStatus.OK);
@@ -244,14 +243,14 @@ public class ApiController {
 	
 	@RequestMapping(value = "/api/contact/invitation/list", method = RequestMethod.GET)
 	public @ResponseBody List<Invitation> getInvitationList(HttpServletRequest request){
-		User user = KeyStore.getLoggedUser(request.getHeader("Authorization"));
+		User user = user_job.getLoggedUser(request.getHeader("Authorization"));
 
 		return message_job.getInvitationList(user);
 	}
 	
 	@RequestMapping(value = "/api/contact/invitation/{invitation_id}", method = RequestMethod.POST)
 	public @ResponseBody ResponseEntity<?> acceptInvitation(HttpServletRequest request, @PathVariable int invitation_id){
-		User user = KeyStore.getLoggedUser(request.getHeader("Authorization"));
+		User user = user_job.getLoggedUser(request.getHeader("Authorization"));
 
 		try{
 			message_job.updateInvitation(user, invitation_id, true);
@@ -263,7 +262,7 @@ public class ApiController {
 	
 	@RequestMapping(value = "/api/contact/invitation/{invitation_id}", method = RequestMethod.DELETE)
 	public @ResponseBody ResponseEntity<?> refuseInvitation(HttpServletRequest request, @PathVariable int invitation_id){
-		User user = KeyStore.getLoggedUser(request.getHeader("Authorization"));
+		User user = user_job.getLoggedUser(request.getHeader("Authorization"));
 
 		try{
 			message_job.updateInvitation(user, invitation_id, false);
@@ -275,7 +274,7 @@ public class ApiController {
 	
 	@RequestMapping(value = "/api/contact/list", method = RequestMethod.GET)
 	public @ResponseBody ResponseEntity<?> listContact(HttpServletRequest request){
-		User user = KeyStore.getLoggedUser(request.getHeader("Authorization"));
+		User user = user_job.getLoggedUser(request.getHeader("Authorization"));
 
 		try{
 			return new ResponseEntity<>(message_job.listContact(user.getId()), HttpStatus.OK);
@@ -286,7 +285,7 @@ public class ApiController {
 	
 	@RequestMapping(value = "/api/contact/rename/{contact_id}", method = RequestMethod.POST)
 	public @ResponseBody ResponseEntity<?> renameContact(HttpServletRequest request, @RequestParam String name, @PathVariable int contact_id){
-		User user = KeyStore.getLoggedUser(request.getHeader("Authorization"));
+		User user = user_job.getLoggedUser(request.getHeader("Authorization"));
 
 		try{
 			message_job.renameContact(user.getId(), name, contact_id);
@@ -298,7 +297,7 @@ public class ApiController {
 	
 	@RequestMapping(value = "/api/contact/search", method = RequestMethod.GET)
 	public @ResponseBody ResponseEntity<?> searchUser(HttpServletRequest request, @RequestParam(required = false) String search){
-		User user = KeyStore.getLoggedUser(request.getHeader("Authorization"));
+		User user = user_job.getLoggedUser(request.getHeader("Authorization"));
 		
 		return new ResponseEntity<>(message_job.searchContact(user, search), HttpStatus.OK);
 	}

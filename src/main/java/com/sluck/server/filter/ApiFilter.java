@@ -11,7 +11,12 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.sluck.server.security.KeyStore;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+import org.springframework.web.context.support.SpringBeanAutowiringSupport;
+
+import com.sluck.server.job.impl.UserJob;
+import com.sluck.server.job.interfaces.IUserJob;
 
 public class ApiFilter implements Filter{
 
@@ -25,11 +30,7 @@ public class ApiFilter implements Filter{
 		
 		String token = req.getHeader("Authorization");
 		if(token != null){
-			if(KeyStore.hasToken(token)){
-				chain.doFilter(request, response);
-			}else{
-				((HttpServletResponse) response).sendError(HttpServletResponse.SC_UNAUTHORIZED, "The token is not valid.");
-			}
+			chain.doFilter(request, response);
 		}else{
 			((HttpServletResponse) response).sendError(HttpServletResponse.SC_BAD_REQUEST, "The request is missing an \"Authorization\" header.");
 		}

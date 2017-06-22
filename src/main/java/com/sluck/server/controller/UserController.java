@@ -26,7 +26,6 @@ import org.springframework.web.multipart.MultipartFile;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sluck.server.entity.User;
 import com.sluck.server.job.interfaces.IUserJob;
-import com.sluck.server.security.KeyStore;
 
 @Controller
 public class UserController {
@@ -72,7 +71,7 @@ public class UserController {
 	
 	@RequestMapping(value = "/api/update", method = RequestMethod.POST)
 	public @ResponseBody ResponseEntity<?> profileUpdate(HttpServletRequest request, HttpServletResponse response, @RequestParam(name = "file", required = false) MultipartFile file, @RequestParam("user") String user_json){
-		User user = KeyStore.getLoggedUser(request.getHeader("Authorization"));
+		User user = user_job.getLoggedUser(request.getHeader("Authorization"));
 		
 		try{
 			ObjectMapper mapper = new ObjectMapper();
@@ -159,12 +158,10 @@ public class UserController {
 	public @ResponseBody ResponseEntity<?> logout(HttpServletRequest request, HttpServletResponse response){
 		String token = request.getHeader("Authorization");
 		
-		User user = KeyStore.getLoggedUser(token);
-		//User db_user = user_job.getUserInfo(user);
+		User user = user_job.getLoggedUser(token);
 
-		user_job.disconnect(user);
+		user_job.disconnect(user, token);
 		
-		KeyStore.clearToken(token);
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 }
