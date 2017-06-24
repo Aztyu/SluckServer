@@ -3,6 +3,7 @@ package com.sluck.server.dao.interfaces;
 import java.util.List;
 
 import com.sluck.server.entity.Reset;
+import com.sluck.server.entity.Token;
 import com.sluck.server.entity.User;
 
 public interface IUserDAO {
@@ -18,4 +19,7 @@ public interface IUserDAO {
 	public User getUser(int user_id);
 	public void setLastLogout(User user);
 	public void updatePeerID(int user_id, String peerjs_id);
+	public void saveToken(String generateToken, int id);
+	public Token findTokenUser(String token);
+	public void deleteToken(Token tok);
 }
