@@ -126,6 +126,18 @@ public class ApiController {
 		}
 	}
 	
+	@RequestMapping(value = "/api/add/bot/{conversation_id}/{bot_id}", method = RequestMethod.DELETE)
+	public @ResponseBody ResponseEntity<?> inviteBot(HttpServletRequest request, @PathVariable int bot_id, @PathVariable int conversation_id){
+		User user = user_job.getLoggedUser(request.getHeader("Authorization"));
+
+		try{
+			message_job.addBot(conversation_id, bot_id);
+			return new ResponseEntity<>(HttpStatus.OK);
+		}catch(Exception ex){
+			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR); 
+		}
+	}
+	
 	@RequestMapping(value = "/api/conversation/search", method = RequestMethod.GET)
 	public @ResponseBody List<Conversation> searchConversation(HttpServletRequest request, @RequestParam(required = false) String search){
 		User user = user_job.getLoggedUser(request.getHeader("Authorization"));
@@ -348,6 +360,17 @@ public class ApiController {
 
 		try{
 			return new ResponseEntity<>(message_job.listContact(user.getId()), HttpStatus.OK);
+		}catch(Exception ex){
+			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR); 
+		}
+	}
+	
+	@RequestMapping(value = "/api/bot/list", method = RequestMethod.GET)
+	public @ResponseBody ResponseEntity<?> listBot(HttpServletRequest request, @PathVariable int conversation_id){
+		User user = user_job.getLoggedUser(request.getHeader("Authorization"));
+
+		try{
+			return new ResponseEntity<>(message_job.listBot(), HttpStatus.OK);
 		}catch(Exception ex){
 			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR); 
 		}

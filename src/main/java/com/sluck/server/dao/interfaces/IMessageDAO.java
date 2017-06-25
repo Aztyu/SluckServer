@@ -46,4 +46,5 @@ public interface IMessageDAO {
 	public void removeConversationUser(Conversation_User c_u);
 	public Message getMessage(int message_id);
 	public void removeMessage(Message message);
+	public List<User> listBot();
 }

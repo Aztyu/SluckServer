@@ -45,7 +45,10 @@ public class MessageJob implements IMessageJob{
 		return user_dao.getUserDetail(id);
 	}
 	
-	
+	@Override
+	public List<User> listBot() {
+		return message_dao.listBot();
+	}
 	
 	@Override
 	public Conversation createConversation(Conversation conversation, User user) {
@@ -62,6 +65,11 @@ public class MessageJob implements IMessageJob{
 		if(conversation.isShared()){	//Si la conversation n'est pas partagé/public on ne peut pas la rejoindre comme ça
 			message_dao.addUserToConversation(conversation.getId(), user.getId(), false, false);
 		}
+	}
+	
+	@Override
+	public void addBot(int conversation_id, int bot_id) {
+		message_dao.addUserToConversation(conversation_id, bot_id, true, false);
 	}
 	
 	@Override

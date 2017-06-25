@@ -152,6 +152,27 @@ public class MessageDAO implements IMessageDAO{
 	}
 	
 	@Override
+	public List<User> listBot() {
+		Session session = this.sessionFactory.openSession();
+		
+		try{
+			Query query = session.createQuery("select u from User u where u.bot = true");
+			List<User> conv_db = (List<User>) query.getResultList();
+			
+			if(conv_db != null && !conv_db.isEmpty()){
+				return conv_db;
+			}else{
+				return null;
+			}
+		}catch(Exception ex){
+			ex.printStackTrace();
+			return null;
+		}finally{
+			session.close();
+		}
+	}
+	
+	@Override
 	public List<Conversation_Invitation> getConversationInvitationList(User user) {
 		Session session = this.sessionFactory.openSession();
 		

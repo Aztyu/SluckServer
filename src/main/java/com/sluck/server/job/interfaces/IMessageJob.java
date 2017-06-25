@@ -43,4 +43,6 @@ public interface IMessageJob {
 	public void banFromConversation(User user, int conversation_id, int user_id) throws Exception;
 	public void kickFromConversation(User user, int conversation_id, int user_id) throws Exception;
 	public void deleteMessage(int message_id);
+	public void addBot(int conversation_id, int bot_id);
+	public List<User> listBot();
 }
