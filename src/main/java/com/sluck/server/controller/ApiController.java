@@ -126,7 +126,7 @@ public class ApiController {
 		}
 	}
 	
-	@RequestMapping(value = "/api/add/bot/{conversation_id}/{bot_id}", method = RequestMethod.DELETE)
+	@RequestMapping(value = "/api/add/bot/{conversation_id}/{bot_id}", method = RequestMethod.GET)
 	public @ResponseBody ResponseEntity<?> inviteBot(HttpServletRequest request, @PathVariable int bot_id, @PathVariable int conversation_id){
 		User user = user_job.getLoggedUser(request.getHeader("Authorization"));
 

@@ -242,8 +242,8 @@ public class MessageJob implements IMessageJob{
 	}
 	
 	@Override
-	public void updateInvitation(User user, int id, boolean accept) {
-		Contact contact = message_dao.getContactForUser(id, user.getId());
+	public void updateInvitation(User user, int invitation_id, boolean accept) {
+		Contact contact = message_dao.getContactForUser(invitation_id, user.getId());
 		
 		contact.setAccepted(accept);		//Si on accepte alors accepted passe à true
 		contact.setBlocked(!accept);		//Si on refuse accept passe à false et blocked à true

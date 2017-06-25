@@ -577,7 +577,7 @@ public class MessageDAO implements IMessageDAO{
 		Session session = this.sessionFactory.openSession();
 		
 		try{
-			Query query = session.createQuery("select c from Contact c where c.user_id = :id and id = :contact_id");
+			Query query = session.createQuery("select c from Contact c where c.contact_id = :contact_id and id = :id");
 			query.setParameter("contact_id", contact_id);
 			query.setParameter("id", id);
 			
