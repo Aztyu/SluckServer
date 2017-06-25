@@ -34,6 +34,7 @@ import com.sluck.server.entity.Conversation_Invitation;
 import com.sluck.server.entity.Message;
 import com.sluck.server.entity.MessageFile;
 import com.sluck.server.entity.User;
+import com.sluck.server.entity.response.Conversation_Infos;
 import com.sluck.server.entity.response.Invitation;
 import com.sluck.server.job.interfaces.IMessageJob;
 import com.sluck.server.job.interfaces.IUserJob;
@@ -81,7 +82,7 @@ public class ApiController {
 	}
 	
 	@RequestMapping(value = "/api/conversation/list", method = RequestMethod.GET)
-	public @ResponseBody List<Conversation> listConversation(HttpServletRequest request){
+	public @ResponseBody List<Conversation_Infos> listConversation(HttpServletRequest request){
 		User user = user_job.getLoggedUser(request.getHeader("Authorization"));
 		
 		return message_job.getConversationList(user);	
@@ -156,6 +157,42 @@ public class ApiController {
 		}
 	}
 	
+	@RequestMapping(value = "/api/conversation/kick/{conversation_id}/{user_id}", method = RequestMethod.POST)
+	public @ResponseBody ResponseEntity<?> kickFromConversation(HttpServletRequest request, @PathVariable int conversation_id, @PathVariable int user_id){
+		User user = user_job.getLoggedUser(request.getHeader("Authorization"));
+		
+		try{
+			message_job.kickFromConversation(user, conversation_id, user_id);
+			return new ResponseEntity<>(HttpStatus.OK);
+		}catch(Exception ex){
+			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR); 
+		}
+	}
+	
+	@RequestMapping(value = "/api/conversation/ban/{conversation_id}/{user_id}", method = RequestMethod.POST)
+	public @ResponseBody ResponseEntity<?> banFromConversation(HttpServletRequest request, @PathVariable int conversation_id, @PathVariable int user_id){
+		User user = user_job.getLoggedUser(request.getHeader("Authorization"));
+		
+		try{
+			message_job.banFromConversation(user, conversation_id, user_id);
+			return new ResponseEntity<>(HttpStatus.OK);
+		}catch(Exception ex){
+			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR); 
+		}
+	}
+	
+	@RequestMapping(value = "/api/conversation/mod/{conversation_id}/{user_id}", method = RequestMethod.POST)
+	public @ResponseBody ResponseEntity<?> makeUserModConversation(HttpServletRequest request, @PathVariable int conversation_id, @PathVariable int user_id){
+		User user = user_job.getLoggedUser(request.getHeader("Authorization"));
+		
+		try{
+			message_job.makeUserModConversation(user, conversation_id, user_id);
+			return new ResponseEntity<>(HttpStatus.OK);
+		}catch(Exception ex){
+			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR); 
+		}
+	}
+	
 	/* Messages */
 	
 	@RequestMapping(value = "/api/message/send/{conversation_id}", method = RequestMethod.POST)
@@ -184,10 +221,34 @@ public class ApiController {
 		}
 	}
 	
+	@RequestMapping(value = "/api/chat/send/{contact_id}", method = RequestMethod.POST)
+	public @ResponseBody Message sendChatMessage(HttpServletRequest request, @PathVariable int contact_id, @RequestParam(name = "file", required = false) CommonsMultipartFile file, @RequestParam(name = "message", required = false) String content){
+		User user = user_job.getLoggedUser(request.getHeader("Authorization"));
+		
+		try{
+			Message message = new Message();
+			message.setContent(content);
+			
+			MessageFile msg_file = null;
+			
+			if(file != null){
+				msg_file = new MessageFile();
+				msg_file.setContentType(file.getContentType());
+				msg_file.setName(file.getFileItem().getName());
+				msg_file.setFile(file);
+			}
+			
+			message.setFile_obj(msg_file);
+			
+			return message_job.sendChatMessage(user, message, contact_id);
+		}catch(IOException ex){
+			ex.printStackTrace();
+			return null;
+		}
+	}
+	
 	@RequestMapping(value = "/file/{id}", method = RequestMethod.GET)
 	public void getFileById(HttpServletRequest request, HttpServletResponse response, @PathVariable int id){
-		//User user = KeyStore.getLoggedUser(request.getHeader("Authorization"));
-		
 		try{
 			
 	      	MessageFile message_file = message_job.getMessageFile(id);

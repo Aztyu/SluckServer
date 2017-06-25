@@ -20,6 +20,9 @@ public class Conversation_User {
 	
 	private int user_id;
 	private int conversation_id;
+	private boolean admin = false;
+	private boolean moderator = false;
+	private boolean banned = false;
 	
 	public int getId() {
 		return id;
@@ -39,6 +42,23 @@ public class Conversation_User {
 	public void setConversation_id(int conversation_id) {
 		this.conversation_id = conversation_id;
 	}
-	
+	public boolean isAdmin() {
+		return admin;
+	}
+	public void setAdmin(boolean admin) {
+		this.admin = admin;
+	}
+	public boolean isModerator() {
+		return moderator;
+	}
+	public void setModerator(boolean moderator) {
+		this.moderator = moderator;
+	}
+	public boolean isBanned() {
+		return banned;
+	}
+	public void setBanned(boolean banned) {
+		this.banned = banned;
+	}
 	
 }

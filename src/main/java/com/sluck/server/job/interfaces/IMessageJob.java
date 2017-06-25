@@ -14,12 +14,13 @@ import com.sluck.server.entity.MessageFile;
 import com.sluck.server.entity.User;
 import com.sluck.server.entity.response.ContactSearch;
 import com.sluck.server.entity.response.ContactStatus;
+import com.sluck.server.entity.response.Conversation_Infos;
 import com.sluck.server.entity.response.Invitation;
 
 public interface IMessageJob {
 	public Conversation createConversation(Conversation conversation, User user);
 	public void joinConversation(int conversation_id, User user);
-	public List<Conversation> getConversationList(User user);
+	public List<Conversation_Infos> getConversationList(User user);
 	public List<Conversation> searchConversation(String search, int user_id);
 	public Message sendMessage(User user, Message message, int conversation_id) throws IOException;
 	public List<Message> listMessages(User user, int conversation_id, int message_id);
@@ -37,4 +38,8 @@ public interface IMessageJob {
 	public List<Conversation_Invitation> getConversationInvitationList(User user);
 	public void updateConvInvitation(User user, int invitation_id, boolean b);
 	public void renameContact(int id, String name, int contact_id) throws Exception;
+	public Message sendChatMessage(User user, Message message, int contact_id) throws IOException;
+	public void makeUserModConversation(User user, int conversation_id, int user_id) throws Exception;
+	public void banFromConversation(User user, int conversation_id, int user_id) throws Exception;
+	public void kickFromConversation(User user, int conversation_id, int user_id) throws Exception;
 }

@@ -21,6 +21,7 @@ import com.sluck.server.entity.MessageFile;
 import com.sluck.server.entity.User;
 import com.sluck.server.entity.response.ContactSearch;
 import com.sluck.server.entity.response.ContactStatus;
+import com.sluck.server.entity.response.Conversation_Infos;
 import com.sluck.server.entity.response.Invitation;
 
 public class MessageDAO implements IMessageDAO{
@@ -31,7 +32,7 @@ public class MessageDAO implements IMessageDAO{
     }
 	
 	@Override
-	public void addUserToConversation(int conversation_id, int user_id) {
+	public void addUserToConversation(int conversation_id, int user_id, boolean admin, boolean moderator) {
 		Session session = this.sessionFactory.openSession();
 
 		Query query = session.createQuery("from Conversation_User cu where cu.user_id = :u_id and cu.conversation_id = :c_id");		//On vérifie que l'utilisateur n'appartient pas déjà à la conversation
@@ -44,6 +45,8 @@ public class MessageDAO implements IMessageDAO{
 			Conversation_User conversation_user = new Conversation_User();		//
 			conversation_user.setConversation_id(conversation_id);
 			conversation_user.setUser_id(user_id);
+			conversation_user.setAdmin(admin);
+			conversation_user.setModerator(moderator);
 			
 			Transaction tx = session.beginTransaction();
 			session.persist(conversation_user);
@@ -120,15 +123,26 @@ public class MessageDAO implements IMessageDAO{
 	}
 	
 	@Override
-	public List<Conversation> getConversationList(User user) {
+	public List<Conversation_Infos> getConversationList(User user) {
 		Session session = this.sessionFactory.openSession();
 		
 		try{
-			Query query = session.createQuery("select c from Conversation c left join Conversation_User cu on c.id = cu.conversation_id where cu.user_id = :id and c.chat = false");
+			Query query = session.createQuery("select c, (cu.admin or cu.moderator) as admin from Conversation c left join Conversation_User cu on c.id = cu.conversation_id where cu.user_id = :id and c.chat = false");
 			query.setParameter("id", user.getId());
-			List<Conversation> conversation_db = (List<Conversation>) query.getResultList();
+			List<Object[]> conv_db = (List<Object[]>) query.getResultList();
 			
-			return conversation_db;
+			if(conv_db != null && !conv_db.isEmpty()){
+				List<Conversation_Infos> conversations = new ArrayList<>();
+				
+				for(Object[] conv_obj : conv_db){
+					Conversation_Infos c_i = new Conversation_Infos((Conversation) conv_obj[0], (boolean) conv_obj[1]);
+					
+					conversations.add(c_i);
+				}
+				return conversations;
+			}else{
+				return null;
+			}
 		}catch(Exception ex){
 			ex.printStackTrace();
 			return null;
@@ -223,7 +237,7 @@ public class MessageDAO implements IMessageDAO{
 			
 			if(conversation_db != null && !conversation_db.isEmpty()){
 				Conversation conversation = conversation_db.get(0);
-				addUserToConversation(conversation.getId(), user.getId());			//Cette fonction va l'ajouter si il n'est pas déjà ajouté
+				addUserToConversation(conversation.getId(), user.getId(), false, false);			//Cette fonction va l'ajouter si il n'est pas déjà ajouté
 				return conversation;
 			}else{
 				return null;
@@ -231,6 +245,30 @@ public class MessageDAO implements IMessageDAO{
 		}catch(Exception ex){
 			ex.printStackTrace();
 			return null;
+		}finally{
+			session.close();
+		}
+	}
+	
+	@Override
+	public boolean hasConversationAdmin(int id, int conversation_id) {
+		Session session = this.sessionFactory.openSession();
+		
+		try{
+			Query query = session.createQuery("select c from Conversation c left join Conversation_User cu on cu.conversation_id = c.id and cu.user_id = :user_id where c.id = :conversation_id and cu.admin = true or cu.moderator = true");
+			query.setParameter("conversation_id", conversation_id);
+			query.setParameter("user_id", id);
+			
+			List<Conversation> conversation_db = (List<Conversation>)query.getResultList();
+			
+			if(conversation_db != null && !conversation_db.isEmpty()){
+				return true;
+			}else{
+				return false;
+			}
+		}catch(Exception ex){
+			ex.printStackTrace();
+			return false;
 		}finally{
 			session.close();
 		}
@@ -426,6 +464,16 @@ public class MessageDAO implements IMessageDAO{
 	}
 	
 	@Override
+	public void removeConversationUser(Conversation_User c_u) {
+		try(Session session = this.sessionFactory.openSession()){
+			Transaction tx = session.beginTransaction();
+			session.remove(c_u);
+			tx.commit();
+			session.close();
+		}
+	}
+	
+	@Override
 	public List<Invitation> getInvitationList(User user) {
 		Session session = this.sessionFactory.openSession();
 		
@@ -466,6 +514,24 @@ public class MessageDAO implements IMessageDAO{
 			
 			Transaction tx = session.beginTransaction();
 			session.merge(contact);
+			tx.commit();
+			session.close();
+		}catch(Exception ex){
+			ex.printStackTrace();
+		}finally{
+			session.close();
+		}
+	}
+	
+	@Override
+	public void updateConversationUser(Conversation_User c_u) {
+		Session session = null;
+		
+		try{
+			session = this.sessionFactory.openSession();
+			
+			Transaction tx = session.beginTransaction();
+			session.merge(c_u);
 			tx.commit();
 			session.close();
 		}catch(Exception ex){

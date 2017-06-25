@@ -23,6 +23,7 @@ import com.sluck.server.entity.MessageFile;
 import com.sluck.server.entity.User;
 import com.sluck.server.entity.response.ContactSearch;
 import com.sluck.server.entity.response.ContactStatus;
+import com.sluck.server.entity.response.Conversation_Infos;
 import com.sluck.server.entity.response.Invitation;
 import com.sluck.server.job.interfaces.IMessageJob;
 import com.sluck.server.security.PropertiesLoader;
@@ -50,7 +51,7 @@ public class MessageJob implements IMessageJob{
 	public Conversation createConversation(Conversation conversation, User user) {
 		conversation.setChat(false); 		//On définit la conversation en non chat pour ne pas limiter à 2 personnes
 		conversation = message_dao.createConversation(conversation);
-		message_dao.addUserToConversation(conversation.getId(), user.getId());
+		message_dao.addUserToConversation(conversation.getId(), user.getId(), true, true);
 		return conversation;
 	}
 
@@ -59,7 +60,7 @@ public class MessageJob implements IMessageJob{
 		Conversation conversation = message_dao.getConversation(conversation_id);
 		
 		if(conversation.isShared()){	//Si la conversation n'est pas partagé/public on ne peut pas la rejoindre comme ça
-			message_dao.addUserToConversation(conversation.getId(), user.getId());
+			message_dao.addUserToConversation(conversation.getId(), user.getId(), false, false);
 		}
 	}
 	
@@ -91,7 +92,7 @@ public class MessageJob implements IMessageJob{
 	}
 
 	@Override
-	public List<Conversation> getConversationList(User user) {
+	public List<Conversation_Infos> getConversationList(User user) {
 		return message_dao.getConversationList(user);
 	}
 	
@@ -124,7 +125,24 @@ public class MessageJob implements IMessageJob{
 		}
 	}
 	
-	
+	@Override
+	public Message sendChatMessage(User user, Message message, int contact_id) throws IOException {
+		Conversation conversation = message_dao.findChatConversation(user.getId(), contact_id);		//On vérifie les droits sur la conversation
+		if(conversation != null){
+			if(message.getFile_obj() != null){
+				message_dao.saveMessageFile(message.getFile_obj());
+				saveFile(message.getFile_obj(), message.getFile_obj().getId());
+				message.setFile_id(message.getFile_obj().getId());
+			}
+			
+			message.setUser_id(user.getId());					//On compléte les informations sur le message
+			message.setConversation_id(conversation.getId());
+			
+			return message_dao.sendMessage(message);			//On sauvegarde les message dans la BDD
+		}else{
+			return null;
+		}
+	}
 	
 	private void saveFile(MessageFile file_obj, int id) throws IOException {
 		File temp_file = new File(String.valueOf(id));
@@ -237,7 +255,7 @@ public class MessageJob implements IMessageJob{
 		
 		if(conv_invit != null && conv_invit.getUser_id() == user.getId()){		//On vérifie que l'invitation existe et qu'elle concerne l'utilisateur
 			if(b){
-				message_dao.addUserToConversation(conv_invit.getConversation_id(), user.getId());
+				message_dao.addUserToConversation(conv_invit.getConversation_id(), user.getId(), false, false);
 			}else{
 				message_dao.removeContactInvitation(invitation_id);
 			}
@@ -254,8 +272,43 @@ public class MessageJob implements IMessageJob{
 		message_dao.createConversation(conv);
 		
 		//creer les conversation_user
-		message_dao.addUserToConversation(conv.getId(), user_id);
-		message_dao.addUserToConversation(conv.getId(), contact_id);
+		message_dao.addUserToConversation(conv.getId(), user_id, false, false);
+		message_dao.addUserToConversation(conv.getId(), contact_id, false, false);
+	}
+	
+	@Override
+	public void banFromConversation(User user, int conversation_id, int user_id) throws Exception {
+		if(message_dao.hasConversationAdmin(user.getId(), conversation_id)){
+			Conversation_User c_u = message_dao.getConversationUser(conversation_id, user_id);
+			c_u.setBanned(true);
+			
+			message_dao.updateConversationUser(c_u);
+		}else{
+			throw new Exception("Vous n'avez pas le droit.");
+		};
+	}
+	
+	@Override
+	public void kickFromConversation(User user, int conversation_id, int user_id) throws Exception {
+		if(message_dao.hasConversationAdmin(user.getId(), conversation_id)){
+			Conversation_User c_u = message_dao.getConversationUser(conversation_id, user_id);
+			
+			message_dao.removeConversationUser(c_u);
+		}else{
+			throw new Exception("Vous n'avez pas le droit.");
+		};
+	}
+	
+	@Override
+	public void makeUserModConversation(User user, int conversation_id, int user_id) throws Exception {
+		if(message_dao.hasConversationAdmin(user.getId(), conversation_id)){
+			Conversation_User c_u = message_dao.getConversationUser(conversation_id, user_id);
+			c_u.setModerator(true);
+			
+			message_dao.updateConversationUser(c_u);
+		}else{
+			throw new Exception("Vous n'avez pas le droit.");
+		};
 	}
 
 	@Override
