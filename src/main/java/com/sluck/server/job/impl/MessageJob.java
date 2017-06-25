@@ -97,6 +97,13 @@ public class MessageJob implements IMessageJob{
 	}
 	
 	@Override
+	public void deleteMessage(int message_id) {
+		Message msg = message_dao.getMessage(message_id);
+		
+		message_dao.removeMessage(msg);
+	}
+	
+	@Override
 	public List<Conversation_Invitation> getConversationInvitationList(User user) {
 		return message_dao.getConversationInvitationList(user);
 	}

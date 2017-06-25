@@ -42,4 +42,5 @@ public interface IMessageJob {
 	public void makeUserModConversation(User user, int conversation_id, int user_id) throws Exception;
 	public void banFromConversation(User user, int conversation_id, int user_id) throws Exception;
 	public void kickFromConversation(User user, int conversation_id, int user_id) throws Exception;
+	public void deleteMessage(int message_id);
 }

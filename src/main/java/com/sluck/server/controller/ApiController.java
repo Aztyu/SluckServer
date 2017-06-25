@@ -195,6 +195,15 @@ public class ApiController {
 	
 	/* Messages */
 	
+	@RequestMapping(value = "/api/message/delete/{message_id}", method = RequestMethod.GET)
+	public @ResponseBody ResponseEntity<?> deleteMessage(HttpServletRequest request, @PathVariable int message_id){
+		User user = user_job.getLoggedUser(request.getHeader("Authorization"));
+		
+		message_job.deleteMessage(message_id);
+		
+		return new ResponseEntity<>(HttpStatus.OK);
+	}
+	
 	@RequestMapping(value = "/api/message/send/{conversation_id}", method = RequestMethod.POST)
 	public @ResponseBody Message sendMessage(HttpServletRequest request, @PathVariable int conversation_id, @RequestParam(name = "file", required = false) CommonsMultipartFile file, @RequestParam(name = "message", required = false) String content){
 		User user = user_job.getLoggedUser(request.getHeader("Authorization"));

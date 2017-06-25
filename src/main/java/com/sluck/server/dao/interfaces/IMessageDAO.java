@@ -44,4 +44,6 @@ public interface IMessageDAO {
 	public boolean hasConversationAdmin(int id, int conversation_id);
 	public void updateConversationUser(Conversation_User c_u);
 	public void removeConversationUser(Conversation_User c_u);
+	public Message getMessage(int message_id);
+	public void removeMessage(Message message);
 }

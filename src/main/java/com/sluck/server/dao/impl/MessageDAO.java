@@ -127,7 +127,7 @@ public class MessageDAO implements IMessageDAO{
 		Session session = this.sessionFactory.openSession();
 		
 		try{
-			Query query = session.createQuery("select c, (cu.admin or cu.moderator) as admin from Conversation c left join Conversation_User cu on c.id = cu.conversation_id where cu.user_id = :id and c.chat = false");
+			Query query = session.createQuery("select c, cu.admin, cu.moderator from Conversation c left join Conversation_User cu on c.id = cu.conversation_id where cu.user_id = :id and c.chat = false");
 			query.setParameter("id", user.getId());
 			List<Object[]> conv_db = (List<Object[]>) query.getResultList();
 			
@@ -135,7 +135,7 @@ public class MessageDAO implements IMessageDAO{
 				List<Conversation_Infos> conversations = new ArrayList<>();
 				
 				for(Object[] conv_obj : conv_db){
-					Conversation_Infos c_i = new Conversation_Infos((Conversation) conv_obj[0], (boolean) conv_obj[1]);
+					Conversation_Infos c_i = new Conversation_Infos((Conversation) conv_obj[0], (boolean) conv_obj[1] || (boolean) conv_obj[2]);
 					
 					conversations.add(c_i);
 				}
@@ -573,6 +573,23 @@ public class MessageDAO implements IMessageDAO{
 		}finally{
 			session.close();
 		}
+	}
+	
+	@Override
+	public Message getMessage(int message_id) {
+		Session session = this.sessionFactory.openSession();
+
+		return session.find(Message.class, message_id);
+	}
+	
+	@Override
+	public void removeMessage(Message message) {
+		Session session = this.sessionFactory.openSession();
+		
+		Transaction tx = session.beginTransaction();
+		session.delete(message);
+		tx.commit();
+		session.close();
 	}
 	
 	@Override
