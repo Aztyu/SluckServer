@@ -21,6 +21,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -214,6 +215,22 @@ public class ApiController {
 		message_job.deleteMessage(message_id);
 		
 		return new ResponseEntity<>(HttpStatus.OK);
+	}
+	
+	
+	
+	@RequestMapping(value = "/api/message/send/bot/{conversation_id}/{content}", method = RequestMethod.POST)
+	public @ResponseBody Message sendBotMessage(HttpServletRequest request, @PathVariable int conversation_id, @PathVariable String content){
+		User user = user_job.getLoggedUser(request.getHeader("Authorization"));
+		
+		try{
+			Message message = new Message();
+			message.setContent(content);
+			return message_job.sendMessage(user, message, conversation_id);
+		}catch(IOException ex){
+			ex.printStackTrace();
+			return null;
+		}
 	}
 	
 	@RequestMapping(value = "/api/message/send/{conversation_id}", method = RequestMethod.POST)
